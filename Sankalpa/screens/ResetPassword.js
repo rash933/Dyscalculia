@@ -1,63 +1,170 @@
-import React from 'react';
-import { StyleSheet, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, View,Keyboard,Alert } from "react-native";
 import { Avatar, Divider, IconButton, Card, Text, Button, TextInput } from 'react-native-paper';
 import Background1 from '../components/background1';
 import { useNavigation } from '@react-navigation/core';
 
-const ResetPwd = () => {
+import axios from 'axios';
+
+const ResetPwd = ({ route }) => {
+    const { email } = route.params;
     const navigation = useNavigation();
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordMatchError, setPasswordMatchError] = useState(false);
+    const [userId, setUserId] = useState(null);
+
+    const checkEmailInApi = async () => {
+        const endpoints = [
+            'http://192.168.1.2:8000/api/studentby',
+            'http://192.168.1.2:8000/api/teachersby'
+        ];
+
+        for (const endpoint of endpoints) {
+            try {
+                const response = await axios.post(endpoint, { Email: email });
+                const data = response.data;
+
+                if (data && Array.isArray(data) && data.length > 0) {
+                    // Email exists in this endpoint
+                    console.log(`User with email ${email} found in ${endpoint}`);
+                    setUserId(data[0]._id); // Assuming the user ID field is '_id', change it if needed
+                    setPasswordMatchError(false); // Clear password match error if any
+                    return endpoint; // Return the endpoint where the user was found
+                }
+            } catch (error) {
+                console.error('Error checking email:', error);
+            }
+        }
+
+        return null; // If no user found in any endpoint
+    };
+
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardVisible(true);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardVisible(false);
+        });
+
+        return () => {
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, []);
+
+    useEffect(() => {
+        const checkUserExistence = async () => {
+            const emailEndpoint = await checkEmailInApi(); // Wait for the email check to complete
+            if (!emailEndpoint) {
+                // User does not exist, show alert or perform any other actions
+                Alert.alert('User Not Found', 'The provided email does not exist. Please try again.');
+                // You can navigate back to the previous screen or take any other action.
+            }
+        };
+
+        checkUserExistence();
+    }, []);
+
+    const handleNextButton = async () => {
+        if (newPassword !== confirmPassword) {
+            setPasswordMatchError(true);
+        } else {
+            setPasswordMatchError(false);
+            const emailEndpoint = await checkEmailInApi(); // Wait for the email check to complete
+            if (emailEndpoint) {
+                await handleUpdatePassword(emailEndpoint); // Call the function to update the password
+            }
+        }
+    };
+
+    const handleUpdatePassword = async (emailEndpoint) => {
+        if (userId) {
+            try {
+                const endpoint = emailEndpoint.includes('teachersby')
+                    ? 'http://192.168.1.2:8000/api/teacher/update'
+                    : 'http://192.168.1.2:8000/api/student/update';
+
+                const response = await axios.put(`${endpoint}/${userId}`, { password: newPassword });
+                console.log('Password updated successfully!');
+                navigation.navigate('FirstPage');
+                // You can perform any additional actions after updating the password
+                // For example, you can navigate to a success page or display a success message.
+            } catch (error) {
+                console.error('Error updating password:', error);
+                // Handle errors if the password update fails
+            }
+        } else {
+            console.error('User ID not found. Unable to update password.');
+        }
+    };
+
+    const isPasswordStrong = (password) => {
+        // Check if the password contains at least one uppercase letter, one lowercase letter, one number, and one special character
+        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        return strongPasswordRegex.test(password);
+    };
+
     return (
         <View style={styles.container}>
-            <Background1 />
-
+            {!isKeyboardVisible && <Background1 />}
 
             <View style={styles.InputBox}>
                 <Text style={styles.headerText}>Reset your password</Text>
-                <View style={styles.input} >
+                <View style={styles.input}>
                     <View style={styles.textFeild}>
-                        <Text style={{ textAlign: 'left' }} variant="titleMedium">New Password</Text>
-                        <TextInput style={{ width: 250 }}
+                        <Text style={{ textAlign: 'left' }} variant="titleMedium">
+                            New Password
+                        </Text>
+                        <TextInput
+                            style={{ width: 250 }}
                             mode="outlined"
-                            outlineColor='#000'
+                            outlineColor="#000"
                             label=""
-                            // placeholder="Type something"
-                          
+                            secureTextEntry={true}
+                            value={newPassword}
+                            onChangeText={setNewPassword}
                         />
-                        <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">Not a strong password</Text>
-                        
+                        {newPassword && !isPasswordStrong(newPassword) && (
+                            <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">
+                                Not a strong password
+                            </Text>
+                        )}
                     </View>
                     <View style={styles.textFeild}>
-                        <Text style={{ textAlign: 'left' }} variant="titleMedium">Confirm Password </Text>
-                        <TextInput style={{ width: 250 }}
+                        <Text style={{ textAlign: 'left' }} variant="titleMedium">
+                            Confirm Password
+                        </Text>
+                        <TextInput
+                            style={{ width: 250 }}
                             mode="outlined"
-                            outlineColor='#000'
+                            outlineColor="#000"
                             label=""
-                            // placeholder="Type something"
-                          
+                            secureTextEntry={true}
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
                         />
-                        <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">Password doesn't match</Text>
-                    </View>
-                    <View style={styles.textFeild}>
-                       
-                    </View>
+                        {passwordMatchError && (
+                            <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">
+                                Passwords don't match
+                            </Text>
+                        )}
 
+                    </View>
                 </View>
 
-                <View style={styles.buttonBox}  >
-                    <Button style={styles.button} textColor='#ffff' mode="contained" onPress={() => { navigation.navigate('FirstPage') }}>
-                        Next 
+                <View style={styles.buttonBox}>
+                    <Button style={styles.button} textColor="#ffff" mode="contained" onPress={handleNextButton}>
+                        Next
                     </Button>
-                    <View style={styles.row} >
-                       
-                    </View>
+                    <View style={styles.row}></View>
                 </View>
-
             </View>
-
-
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {

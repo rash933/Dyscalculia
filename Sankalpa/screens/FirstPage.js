@@ -1,13 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View, Image } from "react-native";
 import { Avatar, Divider, IconButton, Card, Text, Button, TextInput } from 'react-native-paper';
 import Background1 from '../components/background1';
 import Background2 from '../components/background2';
 import { useNavigation } from '@react-navigation/core';
+import * as ScreenOrientation from 'expo-screen-orientation'
+import { BackHandler } from 'react-native';
 
 const FirstPage = () => {
 
     const navigation = useNavigation();
+    useEffect(() => {
+        // Lock the screen orientation to landscape
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+
+        // Handle back button press
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            // Exit the app when the back button is pressed
+            BackHandler.exitApp();
+            return true; // Prevent default behavior (going back to the previous screen)
+        });
+
+        return () => {
+            // Remove the back button event listener when the component unmounts
+            backHandler.remove();
+        };
+    }, []); 
     return (
         <View style={styles.container}>
             <Background2 />

@@ -1,14 +1,85 @@
-import React from 'react';
-import { StyleSheet, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, View,Keyboard } from "react-native";
 import { Avatar, Divider, IconButton, Card, Text, Button, TextInput } from 'react-native-paper';
 import Background1 from '../components/background1';
 import { useNavigation } from '@react-navigation/core';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from "axios";
 
-const StSignIn = () => {
-    const navigation = useNavigation();
+
+
+const StSignIn = ({ navigation, route }) => {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [usernameError, setUsernameError] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardVisible(true);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardVisible(false);
+        });
+
+        return () => {
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, []);
+
+    const handleSignIn = () => {
+        setUsernameError("");
+        setPasswordError("");
+
+        // Validation for non-empty fields
+        if (!username) {
+            setUsernameError("Username cannot be empty.");
+            return;
+        }
+        if (!password) {
+            setPasswordError("Password cannot be empty.");
+            return;
+        }
+
+        // Make the POST request to the server
+        axios
+            .post("http://192.168.1.2:8000/api/students/login", {
+          
+                    Name: username,
+                    Password: password,
+                })
+                    .then((response) => {
+                        const userData = response.data;
+                        // Check if the response data matches the entered username and password
+                        if (
+                            userData.length === 1 &&
+                            userData[0].Name === username &&
+                            userData[0].Password === password
+                        ) {
+                            // Sign-in successful, save the student ID to AsyncStorage
+                            const studentID = userData[0]._id;
+                            AsyncStorage.setItem('CurrentstudentID', studentID).then(() => {
+                                
+                                console.log("CurrentstudentID saved successfully!");
+                            }).catch((error) => {
+                                console.error('Error saving student ID to AsyncStorage:', error);
+                            });
+                            // Navigate to the next screen (e.g., SNavBar)
+                            navigation.navigate("SNavBar", { studentID });
+                        } else {
+                            // Sign-in failed, show error message
+                            setUsernameError("Incorrect username or password.");
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error signing in:", error);
+                    });
+            }
+
     return (
         <View style={styles.container}>
-            <Background1 />
+            {!isKeyboardVisible && <Background1 />}
 
 
             <View style={styles.InputBox}>
@@ -20,10 +91,17 @@ const StSignIn = () => {
                             mode="outlined"
                             outlineColor='#000'
                             label=""
+                            value={username}
+                            onChangeText={setUsername}
                         // placeholder="Type something"
 
                         />
-                        <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">Incorrect Username</Text>
+                        <Text
+                            style={{ textAlign: "left", color: "#ec0b43" }}
+                            variant="titleMedium"
+                        >
+                            {usernameError}
+                        </Text>
                     </View>
                     <View style={styles.textFeild}>
                         <Text style={{ textAlign: 'left' }} variant="titleMedium">Password</Text>
@@ -31,10 +109,19 @@ const StSignIn = () => {
                             mode="outlined"
                             outlineColor='#000'
                             label=""
+                            secureTextEntry={true}
+                            value={password}
+                            onChangeText={setPassword}
+
                         // placeholder="Type something"
 
                         />
-                        <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">Incorrect Password</Text>
+                        <Text
+                            style={{ textAlign: "left", color: "#ec0b43" }}
+                            variant="titleMedium"
+                        >
+                            {passwordError}
+                        </Text>
                     </View>
                     <View style={styles.textFeild}>
 
@@ -43,7 +130,7 @@ const StSignIn = () => {
                 </View>
 
                 <View style={styles.buttonBox}  >
-                    <Button style={styles.button} textColor='#ffff' mode="contained" onPress={() => { navigation.navigate('SNavBar') }}>
+                    <Button style={styles.button} textColor='#ffff' mode="contained" onPress={handleSignIn}>
                         Sign in
                     </Button>
                     <View style={styles.row} >

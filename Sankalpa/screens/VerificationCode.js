@@ -1,58 +1,115 @@
-import React from 'react';
-import { StyleSheet, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, View,Keyboard } from "react-native";
 import { Avatar, Divider, IconButton, Card, Text, Button, TextInput } from 'react-native-paper';
 import Background1 from '../components/background1';
 import { useNavigation } from '@react-navigation/core';
+import axios from 'axios';
 
-const VerifyCode = () => {
-    const navigation = useNavigation();
+const VerifyCode = ({ navigation, route }) => {
+    const { email } = route.params;
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+    const [otp, setOtp] = useState('');
+    const [error, setError] = useState('');
+    const [randomNumber, setRandomNumber] = useState(null);
+
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardVisible(true);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardVisible(false);
+        });
+
+        // Send API request as soon as the component mounts
+        sendOTP();
+
+        return () => {
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, []);
+
+    const sendOTP = async () => {
+        if (!email) {
+            console.error('No email found in route parameters.');
+            return;
+        }
+
+        try {
+            const API_URL = 'http://192.168.1.2:8000/api/mailsend';
+            const randomNumber = Math.floor(100000 + Math.random() * 900000);
+            const requestBody = {
+                email: email,
+                number: randomNumber,
+            };
+            console.log(requestBody);
+            const response = await axios.post(API_URL, requestBody);
+
+            if (response.data) {
+                setRandomNumber(randomNumber); // Store the sent random number
+                console.log('OTP sent successfully:', randomNumber);
+            } else {
+                console.error('Failed to send OTP:', response.data.error);
+            }
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
+    };
+
+    const handleNextButtonPress = () => {
+        if (!otp) {
+            setError('OTP cannot be empty.');
+            return;
+        }
+
+        if (parseInt(otp, 10) === randomNumber) {
+            setError(''); // Reset the error message
+            navigation.navigate('ResetPwd', { email });
+        } else {
+            setError('Invalid OTP.');
+        }
+    };
+
     return (
         <View style={styles.container}>
-            <Background1 />
-
+            {!isKeyboardVisible && <Background1 />}
 
             <View style={styles.InputBox}>
                 <Text style={styles.headerText}>Verification Code</Text>
-                
-                <View style={styles.input} >
+
+                <View style={styles.input}>
                     <View style={styles.textFeild}>
-                        <Text variant='titleSmall' color='#969393'>Enter the 6- digit OTP code we’ve sent to your email </Text>
+                        <Text variant="titleSmall" color="#969393">
+                            Enter the 6-digit OTP code we’ve sent to your email
+                        </Text>
                     </View>
                     <View style={styles.textFeild}>
-                        <Text style={{ textAlign: 'left' }} variant="titleMedium">OTP </Text>
-                        <TextInput style={{ width: 250 }}
+                        <Text style={{ textAlign: 'left' }} variant="titleMedium">
+                            OTP
+                        </Text>
+                        <TextInput
+                            style={{ width: 250 }}
                             mode="outlined"
-                            outlineColor='#000'
+                            outlineColor="#000"
                             label=""
-                        // placeholder="Type something"
-
+                            value={otp}
+                            onChangeText={(text) => setOtp(text)}
                         />
-                        <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">Invalid OTP</Text>
+                        {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
                     </View>
-                    <View style={styles.textFeild}>
-
-                    </View>
-                    <View style={styles.textFeild}>
-
-                    </View>
-
                 </View>
 
-                <View style={styles.buttonBox}  >
-                    <Button style={styles.button} textColor='#ffff' mode="contained" onPress={() => { navigation.navigate('ResetPwd') }}>
+                <View style={styles.buttonBox}>
+                    <Button style={styles.button} textColor="#ffff" mode="contained" onPress={handleNextButtonPress}>
                         Next
                     </Button>
-                    <View style={styles.row} >
-
-                    </View>
+                    <View style={styles.row}></View>
                 </View>
-
             </View>
-
-
         </View>
     );
-}
+};
+
 
 const styles = StyleSheet.create({
     container: {

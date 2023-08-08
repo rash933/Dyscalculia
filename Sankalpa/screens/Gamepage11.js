@@ -1,29 +1,73 @@
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground ,BackHandler } from 'react-native';
 import { Avatar, Divider, IconButton, Card, Text, Button } from 'react-native-paper';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import THomeScreen from './THome';
 import AppBa2 from '../components/appBar2';
 import AppBa3 from '../components/appBa3';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const GamePage11 = () => {
+
+const GamePage11 = ({ navigation, route }) => {
+    const { G9 } = route.params;
+    const handlePress = async (selectedOption) => {
+        let g10Value = 'false';
+
+        if (selectedOption === 2) {
+            g10Value = 'true';
+        }
+
+        const G10 = { ...G9, g10: g10Value };
+        console.log(G10);
+        const trueValuesCount = Object.values(G10).filter((value) => value === 'true').length;
+        const totalPropertiesCount = Object.keys(G10).length;
+        const percentageOfTrueValues = (trueValuesCount / totalPropertiesCount) * 100;
+
+        console.log('Percentage of true values:', percentageOfTrueValues);
+
+        const Quiz = { quiz: Number(percentageOfTrueValues) };
+        console.log(Quiz);
+
+        try {
+            // Get the cached current student ID from AsyncStorage
+            const currentStudentID = await AsyncStorage.getItem('CurrentstudentID');
+
+            // Check if the currentStudentID is available in AsyncStorage
+            if (currentStudentID) {
+                // Use the currentStudentID in the API URL for updating Quiz
+                const updateApiUrl = `http://192.168.1.2:8000/api/student/update/${currentStudentID}`;
+                const response = await axios.put(updateApiUrl, Quiz);
+                console.log('Success updated Quiz to student:', response.data);
+                navigation.navigate('QuizResult');
+            } else {
+                console.log('Current student ID not found in AsyncStorage.');
+            }
+        } catch (error) {
+            console.error('Error posting data:', error);
+        }
+        // Navigate to the next screen (Profile2) with the parameters
+       
+    };
+
+
     useEffect(() => {
-        // Lock the orientation to landscape mode when the component is mounted
+        // Lock the screen orientation to landscape
         ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
 
-        // Clean up the orientation lock when the component is unmounted
+        // Handle back button press
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            // Exit the app when the back button is pressed
+            BackHandler.exitApp();
+            return true; // Prevent default behavior (going back to the previous screen)
+        });
+
         return () => {
-            ScreenOrientation.lockAsync();
+            // Remove the back button event listener when the component unmounts
+            backHandler.remove();
         };
-    }, []);
-
-    const handleGoBack = () => {
-        // Unlock the orientation before leaving the page
-        ScreenOrientation.lockAsync();
-
-        // You can implement your custom logic to go back or exit the current screen here
-    };
+    }, []); 
 
     return (
         <ImageBackground blurRadius={2}
@@ -33,7 +77,7 @@ const GamePage11 = () => {
         >
             <View>
                 <StatusBar style="inverted" />
-                <AppBa3 title={'Quiz 1 '} />
+                <AppBa3 title={'Quiz  '} />
 
 
                 <View style={styles.container}>
@@ -51,7 +95,7 @@ const GamePage11 = () => {
                                 <Text style={styles.largeText} variant="displayLarge">9 / 1 = 6</Text>
 
                                 <View style={styles.Bgroup} >
-                                    <TouchableOpacity>
+                                    <TouchableOpacity onPress={() => handlePress(1)}>
                                         <ImageBackground
                                             source={require('../assets/image/CorrectButton.png')} // Replace this with the path to your image
                                             style={styles.imageBackground}
@@ -59,7 +103,7 @@ const GamePage11 = () => {
 
                                         </ImageBackground>
                                     </TouchableOpacity>
-                                    <TouchableOpacity>
+                                    <TouchableOpacity onPress={() => handlePress(2)}>
                                         <ImageBackground
                                             source={require('../assets/image/WrongButton.png')} // Replace this with the path to your image
                                             style={styles.imageBackground}

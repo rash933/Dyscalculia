@@ -1,13 +1,80 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Image, ScrollView } from "react-native";
 import { Button,Text } from 'react-native-paper';
 import PredictResultsBox from '../components/predictResultsBox';
 import AppBa3 from '../components/appBa3';
 import { useNavigation } from '@react-navigation/core';
-
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const StuProfile = () => {
     const navigation = useNavigation();
+    const [iq, setIq] = useState(null);
+    const [quiz, setQuiz] = useState(null);
+    const [levelStatus, setLevelStatus] = useState(null);
+    const [parentQ, setParentQ] = useState(null);
+    const [dob, setDob] = useState(null);
+    const [age, setAge] = useState(null);
+    const [name, setName] = useState(null);
+
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const calculateAge = (dob) => {
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    };
+
+    const fetchData = async () => {
+        const apiUrl = 'http://192.168.1.2:8000/api/studentby';
+
+        try {
+            // Get the student ID from AsyncStorage
+            const studentID = await AsyncStorage.getItem('CurrentstudentID');
+
+            // Check if studentID is available in AsyncStorage
+            if (studentID) {
+                const requestData = {
+                    _id: studentID,
+                };
+
+                const response = await axios.post(apiUrl, requestData);
+                const studentData = response.data[0];
+
+                // Extract the values you are interested in
+                const iq = studentData.Iq;
+                const quiz = studentData.Quiz;
+                const levelStatus = studentData.LevelStatus;
+                const parentQ = studentData.ParentQ;
+                const name = studentData.Name;
+                const dob = studentData.Dob;
+
+                // Set the extracted values to the state
+                setIq(iq);
+                setQuiz(quiz);
+                setLevelStatus(levelStatus);
+                setParentQ(parentQ);
+                setDob(dob);
+                setName(name);
+                const age = calculateAge(dob);
+                setAge(age);
+            } else {
+                console.log('Student ID not found in AsyncStorage.');
+            }
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
+    };
+
+
 
     return (
         <View style={styles.container}>
@@ -17,13 +84,11 @@ const StuProfile = () => {
                 <View style={styles.box1}>
                     <View style={styles.left}>
                         <Text style={styles.Header}>My Profile</Text>
-                        <Text style={styles.Name}>Hi, Choudary Aoun</Text>
+                            <Text style={styles.Name}>Hi, {name}</Text>
                         <Text style={styles.text}>
-                            Age: 8{"\n"}Responsible Teacher: Duwasha Abenayaka
+                            Age:{age}{"\n"}Responsible Teacher: Duwasha Abenayaka
                         </Text>
-                        <Button textColor='#ffff' mode="contained" buttonColor='#21005D' onPress={() => console.log('Pressed')}>
-                            Edit Profile
-                        </Button>
+                       
                     </View>
                     <View style={styles.right}>
 
@@ -48,10 +113,10 @@ const StuProfile = () => {
 
                         <Text style={styles.studentSkillLevel}>PROBABILITY RESULT</Text>
                         <View style={styles.box4}>
-                                <Text variant="displayMedium" style={{textAlign:'center'}}>  HIGH</Text>
+                                <Text variant="displayMedium" style={{ textAlign: 'center' }}>{levelStatus}</Text>
 
                         </View>
-                        <Button mode="outlined" textColor='#21005D' style={styles.margin} onPress={() => { navigation.navigate('Notifi') }}>
+                        <Button mode="outlined" textColor='#002060' style={styles.margin} onPress={() => { navigation.navigate('Notifi') }}>
                             View Notifications
                         </Button>
 
@@ -63,7 +128,7 @@ const StuProfile = () => {
                                 <Text style={styles.smallText}>
                                     IQ Quiz{"\n"}marks
                                 </Text>
-                                <Text style={styles.smallText21}>10</Text>
+                                    <Text style={styles.smallText21}>{iq}</Text>
                             </View>
                         </View>
                         <View style={styles.group}>
@@ -71,7 +136,7 @@ const StuProfile = () => {
                                 <Text style={styles.smallText}>
                                     Child{"\n"}behavior marks
                                 </Text>
-                                <Text style={styles.smallText22}>10</Text>
+                                    <Text style={styles.smallText22}>{parentQ}</Text>
                             </View>
                         </View>
                         <View style={styles.group}>
@@ -79,7 +144,7 @@ const StuProfile = () => {
                                 <Text style={styles.smallText}>
                                     Math Quiz{"\n"}Math Quiz
                                 </Text>
-                                <Text style={styles.smallText23}>10</Text>
+                                    <Text style={styles.smallText23}>{quiz}</Text>
                             </View>
                         </View>
                         
@@ -200,7 +265,7 @@ const styles = StyleSheet.create({
     },
     box1: {
         width: 314,
-        height: 187,
+        height: 160,
         backgroundColor: "rgba(255,255,255,1)",
       
         elevation: 5,
@@ -215,7 +280,7 @@ const styles = StyleSheet.create({
     left: {
         alignSelf: 'flex-start',
         textAlign: 'left',
-        marginTop: 12,
+        marginTop: 18,
         marginLeft: 14,
         width:180
     },

@@ -1,4 +1,4 @@
-import * as React from 'react';
+
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton, TextInput } from 'react-native-paper';
@@ -6,50 +6,77 @@ import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-const StudentMarks2 = () => {
-    const navigation = useNavigation();
-    // const [searchQuery, setSearchQuery] = React.useState('');
+import React, { useState } from 'react';
 
-    // const onChangeSearch = query => setSearchQuery(query);
+const StudentMarks2 = ({ navigation, route }) => {
+   
+
+    // Get Mlist1 from the previous screen (StudentMarks)
+    const { Mlist1 } = route.params;
+
+    const [testm, setTestm] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
+
+    // Function to validate test exam marks input
+    const validateInput = () => {
+        const marks = parseFloat(testm);
+        if (isNaN(marks) || marks < 0 || marks > 100) {
+            setErrorMsg('Marks range should be between 0 to 100');
+            return false;
+        }
+        setErrorMsg('');
+        return true;
+    };
+
+    // Function to handle navigation to the next screen
+    const handleContinue = () => {
+        if (validateInput()) {
+            const Mlist2 = { ...Mlist1, testm };
+            console.log(Mlist2); // <-- Print Mlist2 in the console
+            navigation.navigate('StudentMarks3', { Mlist2 });
+        }
+    };
+
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
             <AppBa2 title={' In-class activity details'} />
             <View style={styles.box1}>
                 <View style={styles.box2}>
-                    <ProgressBar progress={0.3} color='#21005D' />
+                    <ProgressBar progress={0.3} color='#002060' />
                 </View>
 
                 <View style={styles.box3}>
-
-                    <Text style={{ textAlign: 'center' }} variant="headlineLarge">Enter student’s
-                        class Test exam marks </Text>
-                    <View style={styles.input} >
-                        <Text style={{ textAlign: 'left' }} variant="titleMedium">Test exam marks </Text>
-                        <TextInput style={{ width: 250 }}
+                    <Text style={{ textAlign: 'center' }} variant="headlineLarge">
+                        Enter student’s class Test exam marks
+                    </Text>
+                    <View style={styles.input}>
+                        <Text style={{ textAlign: 'left' }} variant="titleMedium">Test exam marks</Text>
+                        <TextInput
+                            style={{ width: 250 }}
                             mode="outlined"
-                            outlineColor='#000'
+                            outlineColor="#000"
                             label=""
-                            // placeholder="Type something"
-                         
+                            value={testm}
+                            onChangeText={(text) => setTestm(text)}
+                            keyboardType="numeric"
                         />
-                        <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">Marks range : 0-100</Text>
+                        {errorMsg ? (
+                            <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">
+                                {errorMsg}
+                            </Text>
+                        ) : null}
                     </View>
-
 
                     <View style={styles.note}>
-                        <Text variant="titleMedium">** Please enter correct input for predict student 
-                            skill level </Text>
+                        <Text variant="titleMedium">** Please enter correct input for predict student skill level</Text>
                     </View>
-
-
                 </View>
 
                 <View style={styles.box4}>
-                    <Button textColor='#ffff' onPress={() => { navigation.navigate('StudentMarks3') }} mode='contained'>CONTINUE</Button>
+                    <Button textColor='#ffff' onPress={handleContinue} mode='contained'>CONTINUE</Button>
                 </View>
             </View>
-
         </View>
     );
 };

@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { StyleSheet, View, Text, Dimensions, ScrollView,Image } from "react-native";
 import { Button } from 'react-native-paper';
 import PredictResultsBox from '../components/predictResultsBox';
@@ -8,6 +9,66 @@ import { useNavigation } from '@react-navigation/core';
 
 const THomeScreen = () => {
     const navigation = useNavigation();
+    const TID = '64ca1a7b3362ce71d6fdc5f1';
+    const [teacherData, setTeacherData] = useState(null);
+    const [studentCount, setStudentCount] = useState(0);
+    const [highLevelStudentCount, setHighLevelStudentCount] = useState(0);
+    const [highMediumLevelStudentCount, setHighMediumLevelStudentCount] = useState(0);
+    const [lowLevelStudentCount, setLowLevelStudentCount] = useState(0);
+    const [lowMediumLevelStudentCount, setLowMediumLevelStudentCount] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    useEffect(() => {
+        // Fetch all students with TeacherID: "0"
+        axios
+            .post("http://192.168.1.2:8000/api/markby", {
+                TeacherId: TID,
+            })
+            .then((response) => {
+                const students = response.data;
+
+                // Calculate counts based on prediction levels
+                const highLevelStudents = students.filter(
+                    (student) => student.Prediction === "high level"
+                );
+                const highMediumLevelStudents = students.filter(
+                    (student) => student.Prediction === "high medium"
+                );
+                const lowLevelStudents = students.filter(
+                    (student) => student.Prediction === "low level"
+                );
+                const lowMediumLevelStudents = students.filter(
+                    (student) => student.Prediction === "low medium"
+                );
+
+                setStudentCount(students.length);
+                setHighLevelStudentCount(highLevelStudents.length);
+                setHighMediumLevelStudentCount(highMediumLevelStudents.length);
+                setLowLevelStudentCount(lowLevelStudents.length);
+                setLowMediumLevelStudentCount(lowMediumLevelStudents.length);
+
+                // Fetching completed, set isLoading to false
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.error("Error fetching student data:", error);
+                setIsLoading(false); // Set isLoading to false even in case of an error
+            });
+
+        fetchTeacherData();
+    }, []);
+
+    const fetchTeacherData = async () => {
+        try {
+            const response = await axios.post('http://192.168.1.2:8000/api/teachersby', {
+                _id: TID,
+            });
+            const teacher = response.data[0];
+            setTeacherData(teacher);
+        } catch (error) {
+            console.error('Error fetching teacher data:', error);
+        }
+    };
+
 
     return (
         <View style={styles.container}>
@@ -46,10 +107,22 @@ const THomeScreen = () => {
                     <View style={styles.box3}>
 
                         <Text style={styles.studentSkillLevel}>Student Skill Level</Text>
-                        <View style={styles.box4}>
-                            <StudentChart />
+                            <View style={styles.box4}>
+                                {isLoading ? (
+                                    <View>
+                                        <Text>Loading...</Text>
+                                    </View>
+                                ) : (
+                                    <StudentChart
+                                        totalCount={studentCount}
+                                        highLevelCount={highLevelStudentCount}
+                                        highMediumLevelCount={highMediumLevelStudentCount}
+                                        lowLevelCount={lowLevelStudentCount}
+                                        lowMediumLevelCount={lowMediumLevelStudentCount}
+                                    />
+                                )}
+                            </View>
 
-                        </View>
                         <Button mode="outlined" textColor='#000'  style={styles.margin} onPress={() => { navigation.navigate('ResultList') }}>
                             View Student List
                         </Button>
@@ -62,31 +135,31 @@ const THomeScreen = () => {
                                 <Text style={styles.smallText}>
                                     Low level{"\n"} student
                                 </Text>
-                                <Text style={styles.smallText21}>10</Text>
+                                    <Text style={styles.smallText21}>{lowLevelStudentCount}</Text>
                             </View>
                         </View>
                         <View style={styles.group}>
                             <View style={styles.box6}>
                                 <Text style={styles.smallText}>
-                                    Low level{"\n"} student
+                                    Low Medium{"\n"} student
                                 </Text>
-                                <Text style={styles.smallText22}>5</Text>
+                                    <Text style={styles.smallText22}>{lowMediumLevelStudentCount}</Text>
                             </View>
                         </View>
                         <View style={styles.group}>
                             <View style={styles.box6}>
                                 <Text style={styles.smallText}>
-                                    Low level{"\n"} student
+                                    High level{"\n"} student
                                 </Text>
-                                <Text style={styles.smallText23}>8</Text>
+                                    <Text style={styles.smallText23}>{highLevelStudentCount}</Text>
                             </View>
                         </View>
                         <View style={styles.group}>
                             <View style={styles.box6}>
                                 <Text style={styles.smallText}>
-                                    Low level{"\n"} student
+                                    High Medium{"\n"} student
                                 </Text>
-                                <Text style={styles.smallText24}>2</Text>
+                                    <Text style={styles.smallText24}>{highMediumLevelStudentCount}</Text>
                             </View>
                         </View>
                     </View>

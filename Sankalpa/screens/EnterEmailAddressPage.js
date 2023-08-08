@@ -1,54 +1,79 @@
-import React from 'react';
-import { StyleSheet, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, View ,Keyboard} from "react-native";
 import { Avatar, Divider, IconButton, Card, Text, Button, TextInput } from 'react-native-paper';
 import Background1 from '../components/background1';
 import { useNavigation } from '@react-navigation/core';
 
 const EnterEmailAddressPage = () => {
     const navigation = useNavigation();
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+    const [email, setEmail] = useState('');
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardVisible(true);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardVisible(false);
+        });
+
+        return () => {
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, []);
+
+    const handleNextButtonPress = () => {
+        if (!email) {
+            setError('Email address cannot be empty.');
+        } else if (!validateEmail(email)) {
+            setError('Invalid email address.');
+        } else {
+            setError(''); // Reset the error message
+            navigation.navigate('VerifyCode', { email });
+        }
+    };
+
+    const validateEmail = (email) => {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email);
+    };
+
     return (
         <View style={styles.container}>
-            <Background1 />
-
+            {!isKeyboardVisible && <Background1 />}
 
             <View style={styles.InputBox}>
-                <Text style={styles.headerText}>Enter your Email address  </Text>
-                <View style={styles.input} >
+                <Text style={styles.headerText}>Enter your Email address</Text>
+                <View style={styles.input}>
                     <View style={styles.textFeild}>
-                        <Text style={{ textAlign: 'left' }} variant="titleMedium">E-mail </Text>
-                        <TextInput style={{ width: 250 }}
+                        <Text style={{ textAlign: 'left' }} variant="titleMedium">
+                            E-mail
+                        </Text>
+                        <TextInput
+                            style={{ width: 250 }}
                             mode="outlined"
-                            outlineColor='#000'
+                            outlineColor="#000"
                             label=""
-                            // placeholder="Type something"
-                           
+                            value={email}
+                            onChangeText={(text) => setEmail(text)}
                         />
-                        <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">Invalid Email</Text>
+                        {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
                     </View>
-                    <View style={styles.textFeild}>
-                        
-                    </View>
-                    <View style={styles.textFeild}>
-                     
-                    </View>
-                  
                 </View>
 
-                <View style={styles.buttonBox}  >
-                    <Button style={styles.button} textColor='#ffff' mode="contained" onPress={() => { navigation.navigate('VerifyCode') }}>
+                <View style={styles.buttonBox}>
+                    <Button style={styles.button} textColor="#ffff" mode="contained" onPress={handleNextButtonPress}>
                         Next
                     </Button>
-                    <View style={styles.row} >
-                       
-                    </View>
+                    <View style={styles.row}></View>
                 </View>
-
             </View>
-
-
         </View>
     );
-}
+};
+
 
 const styles = StyleSheet.create({
     container: {

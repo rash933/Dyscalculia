@@ -72,7 +72,7 @@ const theme = {
   ...DefaultTheme,
   colors: {
 
-    primary: '#21005D',
+    primary: '#002060',
     secondary: '#EADDFF',
     tertiary: '#ffff',
     myOwnProperty: true,

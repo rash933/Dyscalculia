@@ -1,70 +1,106 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton, TextInput, RadioButton } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
+import axios from 'axios';
 
-const NotifiView = () => {
+const NotifiView = ({ navigation, route }) => {
+    const { _id } = route.params;
+    const [studentData, setStudentData] = useState(null);
+    const [studentName, setStudentName] = useState('');
+    const [stageId, setStageId] = useState('');
 
-  
+    useEffect(() => {
+        fetchStudentDetails(_id);
+    }, []);
+
+    const fetchStudentDetails = async (_id) => {
+        try {
+            // Fetch student details using markId
+            const markResponse = await axios.post('http://192.168.1.2:8000/api/markby', { _id: _id });
+            const studentId = markResponse.data[0].StudentID;
+
+            // Fetch student name and stage ID using studentId
+            const studentResponse = await axios.post('http://192.168.1.2:8000/api/studentby', { _id: studentId });
+            const studentDetails = studentResponse.data[0];
+
+            setStudentData(markResponse.data[0]);
+            setStudentName(studentDetails.Name);
+            setStageId(studentDetails.StageId);
+        } catch (error) {
+            console.error('Error fetching student details:', error);
+        }
+    };
+
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
             <AppBa2 title={'Notification 1'} />
             <View style={styles.box1}>
-               
+
                 <View style={styles.box3}>
 
                     <Text style={{ textAlign: 'center' }} variant="headlineLarge">Student
                         Skill Level predication Report </Text>
                     <View style={styles.input} >
 
-                        <Text style={{ marginBottom: 1,fontWeight:'bold' }} variant="titleMedium">Student Name </Text>
-                        <Text style={{ marginBottom: 15 }} variant="labelLarge">Stage Id (Primary / Secondary ) </Text>
+                        <Text style={{ marginBottom: 1, fontWeight: 'bold' }} variant="headlineSmall"> Student Name: {studentName} </Text>
+                        <Text style={{ marginBottom: 15 }} variant="titleMedium"> Stage : {stageId ? 'Middle School' : 'Primary School'} {stageId}</Text>
 
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10 }} variant="labelLarge">Class Test exam Marks :</Text>
-                            <Text style={{ marginBottom: 10 }} variant="labelLarge">323232323232</Text>
-                        </View>
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10 }} variant="labelLarge">Class performance Marks : </Text>
-                            <Text style={{ marginBottom: 10 }} variant="labelLarge">323232323232</Text>
-                        </View>
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10 }} variant="labelLarge">Class Assignment Marks  :</Text>
-                            <Text style={{ marginBottom: 10 }} variant="labelLarge">323232323232</Text>
-                        </View>
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10 }} variant="labelLarge">Class Attendance details :</Text>
-                            <Text style={{ marginBottom: 10 }} variant="labelLarge">323232323232</Text>
-                        </View>
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10, fontWeight: 'bold' }} variant="titleMedium">Skill Level Result  :</Text>
-                            <Text style={{ marginBottom: 10, color: '#ec0b43' }} variant="titleLarge"> Low Level</Text>
-                        </View>
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10 }} variant="labelLarge">Teacher Feedback  :</Text>
-                            <View style={{ height: 60, width: 150 }}>
-                                <Text style={{ marginBottom: 10 }} variant="labelLarge"  >323sssssssssssssssssssssssssssssssssssssssssssssssssssssss55555555555555555555555555555232323232</Text>
-                            </View>
+                        {studentData && (
+                            <>
+                                <View style={styles.group} >
+                                    <Text style={{ marginBottom: 10 }} variant="titleMedium">Class Test exam Marks :</Text>
+                                    <Text style={{ marginBottom: 10 }} variant="titleMedium"> {studentData.TestM}</Text>
+                                </View>
+                                <View style={styles.group} >
+                                    <Text style={{ marginBottom: 10 }} variant="titleMedium">Class performance Marks : </Text>
+                                    <Text style={{ marginBottom: 10 }} variant="titleMedium">{studentData.PerformanceM}</Text>
+                                </View>
+                                <View style={styles.group} >
+                                    <Text style={{ marginBottom: 10 }} variant="titleMedium">Class Assignment Marks  :</Text>
+                                    <Text style={{ marginBottom: 10 }} variant="titleMedium">   {studentData.AssignmentM}</Text>
+                                </View>
+                                <View style={styles.group} >
+                                    <Text style={{ marginBottom: 10 }} variant="titleMedium">Class Attendance details :</Text>
+                                    <Text style={{ marginBottom: 10 }} variant="titleMedium">{studentData.AttandenceM}</Text>
+                                </View>
+                                <View style={styles.group} >
+                                    <Text style={{ marginBottom: 10, fontWeight: 'bold' }} variant="titleLarge">Skill Level Result  :</Text>
+                                    <Text style={{ marginBottom: 10, color: '#ec0b43' }} variant="titleLarge">{studentData.Prediction}</Text>
+                                </View>
+                                {studentData.FeedBack !== "0" && (
+                                    <>
+                                        <Text style={{ marginBottom: 10 }} variant="titleMedium">
+                                            Teacher Feedback:
+                                        </Text>
+                                        <View style={{ height: 60, width: 150 }}>
+                                            <Text style={{ marginBottom: 10 }} variant="titleMedium">
+                                                {studentData.FeedBack}
+                                            </Text>
+                                        </View>
+                                    </>
+                                )}
 
-                        </View>
+                                {/* <View style={styles.group} >
+                                    <Text style={{ marginBottom: 10 }} variant="titleMedium">Date and Time  :</Text>
+                                    <Text style={{ marginBottom: 10 }} variant="titleMedium">323232323232</Text>
+                        </View> */}
 
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10 }} variant="labelLarge">Date and Time  :</Text>
-                            <Text style={{ marginBottom: 10 }} variant="labelLarge">323232323232</Text>
-                        </View>
+                            </>
+                        )}
                     </View>
 
 
-                   
+
 
 
                 </View>
 
                 <View style={styles.box4}>
-                  
+
                 </View>
             </View>
 

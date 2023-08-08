@@ -5,26 +5,29 @@ import { Card, Text, Button } from 'react-native-paper';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import AppBa3 from '../components/appBa3';
 import { useNavigation } from '@react-navigation/core';
+import { BackHandler } from 'react-native';
 
 const GamePage1 = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    // Lock the orientation to landscape mode when the component is mounted
+    // Lock the screen orientation to landscape
     ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
 
-    // Clean up the orientation lock when the component is unmounted
+    // Handle back button press
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Exit the app when the back button is pressed
+      BackHandler.exitApp();
+      return true; // Prevent default behavior (going back to the previous screen)
+    });
+
     return () => {
-      ScreenOrientation.unlockAsync();
+      // Remove the back button event listener when the component unmounts
+      backHandler.remove();
     };
-  }, []);
+  }, []); 
 
-  const handleGoBack = () => {
-    // Unlock the orientation before leaving the page
-    ScreenOrientation.lockAsync();
 
-    // You can implement your custom logic to go back or exit the current screen here
-  };
 
   return (
     <View style={styles.container}>
@@ -45,7 +48,7 @@ const GamePage1 = () => {
           <Card.Cover style={styles.cardCover} source={require('../assets/image/Other/box2.png')} />
           <Card.Content style={styles.margin}>
             <Text variant="bodyMedium">Test your math knowledge... Try this now...</Text>
-            <Button style={styles.margin} textColor="#ffff" onPress={() => { navigation.navigate('GamePage21') }} mode="contained">
+            <Button style={styles.margin} textColor="#ffff" onPress={() => { navigation.navigate('GamePage2') }} mode="contained">
               PLAY
             </Button>
           </Card.Content>

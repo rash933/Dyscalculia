@@ -1,22 +1,40 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton, TextInput } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
-const Profile2 = () => {
-    const navigation = useNavigation();
-    // const [searchQuery, setSearchQuery] = React.useState('');
 
-    // const onChangeSearch = query => setSearchQuery(query);
+const Profile2 = ({ navigation, route }) => {
+
+    const { IQCheck1 } = route.params;
+    
+
+    const [dobError, setDobError] = useState(false);
+    const [dob, setdob] = useState('');
+
+    const Next = () => {
+        const IQCheck2 = { ...IQCheck1, dob };
+
+        console.log(IQCheck2);
+        // Navigate to the next screen (InputScreen2)
+        navigation.navigate('Profile3', { IQCheck2 });
+    };
+
+    const handleDOBChange = (text) => {
+        setdob(text);
+        // Check for the correct format using a regular expression
+        const dobFormat = /^\d{4}-\d{2}-\d{2}$/;
+        setDobError(!dobFormat.test(text));
+    };
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
             <AppBa2 title={'Complete Profile'} />
             <View style={styles.box1}>
                 <View style={styles.box2}>
-                    <ProgressBar progress={0.6} color='#21005D'/>
+                    <ProgressBar progress={0.6} color='#002060'/>
                 </View>
 
                 <View style={styles.box3}>
@@ -28,10 +46,18 @@ const Profile2 = () => {
                             mode="outlined"
                             outlineColor='#000'
                             label=""
-                            // placeholder="Type something"
-                          
+                            value={dob}
+                            onChangeText={handleDOBChange}
+                        // placeholder="Type something"
+
                         />
-                        <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">Add the date of birth</Text>
+                        {dobError && (
+                            <Text style={{ textAlign: 'left', color: '#ec0b43' }}>
+                                Incorrect format ("xxxx-xx-xx")
+                            </Text>
+                        )}
+                          
+                      
                     </View>
 
 
@@ -43,7 +69,7 @@ const Profile2 = () => {
                 </View>
 
                 <View style={styles.box4}>
-                    <Button textColor='#ffff' onPress={() => { navigation.navigate('Profile3') }} mode='contained'>CONTINUE</Button>
+                    <Button textColor='#ffff' onPress={Next} mode='contained'>CONTINUE</Button>
                 </View>
             </View>
 

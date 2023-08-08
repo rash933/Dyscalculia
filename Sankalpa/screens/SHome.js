@@ -23,7 +23,7 @@ const StdHomeScreen = () => {
                                     <Text style={styles.text}>
                                         Check the dyscalculia probability level of{"\n"}students
                                     </Text>
-                                    <Button textColor='#ffff' buttonColor='#21005D' mode="contained" onPress={() => { navigation.navigate('Onboardk') }}>
+                                    <Button textColor='#ffff' buttonColor='#002060' mode="contained" onPress={() => { navigation.navigate('Onboardk') }}>
                                         Predict Results
                                     </Button>
                                 </View>
@@ -64,7 +64,7 @@ const StdHomeScreen = () => {
                                     </View>
 
                                 </View>
-                                <Button textColor='#ffff' buttonColor='#21005D' style={{ width: 270 }} mode="contained" onPress={() => { navigation.navigate('GamePage1') }}>
+                                <Button textColor='#ffff' buttonColor='#002060' style={{ width: 270 }} mode="contained" onPress={() => {  }}>
                                     Train  Skill
                                 </Button>
                             </View>
@@ -86,7 +86,7 @@ const StdHomeScreen = () => {
                                     {
                                         icon: 'bell',
                                         label: 'Notifications ',
-                                        onPress: () => console.log('Pressed notifications'),
+                                        onPress: () => { navigation.navigate('Notifi') },
                                     },
                                 ]}
                                 onStateChange={onStateChange}

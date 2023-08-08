@@ -1,28 +1,88 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Image, ImageBackground } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Image, ImageBackground,BackHandler } from 'react-native';
 import { Avatar, Divider, IconButton, Card, Text, Button } from 'react-native-paper';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import THomeScreen from './THome';
 import AppBa2 from '../components/appBar2';
 import AppBa3 from '../components/appBa3';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const QuizResult = () => {
+
+const QuizResult = ({ navigation }) => {
+
+    const [iq, setIq] = useState(null);
+    const [quiz, setQuiz] = useState(null);
+    const [levelStatus, setLevelStatus] = useState(null);
+    const [parentQ, setParentQ] = useState(null);
+
     useEffect(() => {
-        // Lock the orientation to landscape mode when the component is mounted
+        fetchData();
+        // Lock the screen orientation to landscape
         ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
 
-        // Clean up the orientation lock when the component is unmounted
+        // Handle back button press
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            // Exit the app when the back button is pressed
+            BackHandler.exitApp();
+            return true; // Prevent default behavior (going back to the previous screen)
+        });
+
         return () => {
-            ScreenOrientation.lockAsync();
+            // Remove the back button event listener when the component unmounts
+            backHandler.remove();
         };
-    }, []);
+    }, []); 
 
-    const handleGoBack = () => {
-        // Unlock the orientation before leaving the page
-        ScreenOrientation.lockAsync();
 
-        // You can implement your custom logic to go back or exit the current screen here
+    const handleGoToLoader = () => {
+        navigation.navigate('Loader'); // Navigate to 'Loader' when the icon is pressed
+    };
+
+
+   
+
+    const fetchData = async () => {
+        try {
+
+            const apiUrl = 'http://192.168.1.2:8000/api/studentby';
+            // Get the cached current student ID from AsyncStorage
+            const currentStudentID = await AsyncStorage.getItem('CurrentstudentID');
+
+            // Check if the currentStudentID is available in AsyncStorage
+            if (currentStudentID) {
+                // Use the currentStudentID in the requestData for the API request
+                const requestData = {
+                    _id: currentStudentID,
+                };
+
+                const response = await axios.post(apiUrl, requestData);
+                const studentData = response.data[0];
+
+                // Extract the values you are interested in
+                const iq = studentData.Iq;
+                const quiz = studentData.Quiz;
+                const levelStatus = studentData.LevelStatus;
+                const parentQ = studentData.ParentQ;
+                const name = studentData.Name;
+                const dob = studentData.Dob;
+
+                // Set the extracted values to the state
+                setIq(iq);
+                setQuiz(quiz);
+                setLevelStatus(levelStatus);
+                setParentQ(parentQ);
+                setDob(dob);
+                setName(name);
+                const age = calculateAge(dob);
+                setAge(age);
+            } else {
+                console.log('Current student ID not found in AsyncStorage.');
+            }
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
     };
 
     return (
@@ -30,80 +90,54 @@ const QuizResult = () => {
             <StatusBar style="inverted" />
             <AppBa3 title={'RESULT AND SUMMERY '} />
             <View style={styles.container}>
-
-
-
-                <View style={styles.box2}>
-
-
-
-                    <View style={styles.row}>
-
-                        <View style={styles.box7}>
-                            <Text variant="headlineSmall"> Probability{'\n'}  Level</Text>
-                            <Text variant="headlineMedium" style={{ color:'#ec0b43',fontWeight:'bold'}} >HIGH</Text>
-
-
-                        </View>
-                        <View style={styles.box4}>
-                            <IconButton icon="home" size={40} iconColor='#000' onPress={() => { }} />
-                                
-                            
-
-
-                        </View>
-
-
+            <View style={styles.box2}>
+                <View style={styles.row}>
+                    <View style={styles.box7}>
+                        <Text variant="headlineSmall"> Probability{'\n'} Level</Text>
+                        <Text variant="headlineMedium" style={{ color: '#ec0b43', fontWeight: 'bold' }}>{levelStatus}</Text>
                     </View>
-
-                    <View style={styles.box3}>
-
-
-                        <View style={styles.boxb}>
-
-                            <View style={styles.Bgroup} >
-
-                                <Image
-                                    style={styles.Image}
-                                    source={require('../assets/image/Other/image_2-removebg-preview.png')}
-                                />
-                                <View style={styles.group}>
-                                    <View style={styles.box6}>
-                                        <Text style={styles.smallText}>
-                                            Low level{"\n"} student
-                                        </Text>
-                                        <Text style={styles.smallText2}>10</Text>
-                                    </View>
-                                </View>
-                                <View style={styles.group}>
-                                    <View style={styles.box6}>
-                                        <Text style={styles.smallText}>
-                                            Low level{"\n"} student
-                                        </Text>
-                                        <Text style={styles.smallText2}>10</Text>
-                                    </View>
-                                </View>
-                                <View style={styles.group}>
-                                    <View style={styles.box6}>
-                                        <Text style={styles.smallText}>
-                                            Low level{"\n"} student
-                                        </Text>
-                                        <Text style={styles.smallText2}>10</Text>
-                                    </View>
-                                </View>
-
-
-                            </View>
-
-                        </View>
-
+                    <View style={styles.box4}>
+                        {/* Assuming handleGoToLoader is a valid function */}
+                        <IconButton icon="home" size={40} iconColor='#000' onPress={handleGoToLoader} />
                     </View>
-
                 </View>
-                {/* <Button title="Go Back" onPress={handleGoBack} /> */}
+                <View style={styles.box3}>
+                    <View style={styles.boxb}>
+                        <View style={styles.Bgroup}>
+                            <Image
+                                style={styles.Image}
+                                source={require('../assets/image/Other/image_2-removebg-preview.png')}
+                            />
+                            <View style={styles.group}>
+                                <View style={styles.box6}>
+                                    <Text style={styles.smallText}>
+                                        IQ Quiz{"\n"}marks
+                                    </Text>
+                                    <Text style={styles.smallText2}>{iq}</Text>
+                                </View>
+                            </View>
+                            <View style={styles.group}>
+                                <View style={styles.box6}>
+                                    <Text style={styles.smallText}>
+                                            Math Quiz{"\n"} marks
+                                    </Text>
+                                    <Text style={styles.smallText2}> {quiz}</Text>
+                                </View>
+                            </View>
+                            <View style={styles.group}>
+                                <View style={styles.box6}>
+                                    <Text style={styles.smallText}>
+                                            Child behavior{"\n"}marks
+                                    </Text>
+                                    <Text style={styles.smallText2}> {parentQ}</Text>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+            </View>
             </View>
         </View>
-
     );
 };
 

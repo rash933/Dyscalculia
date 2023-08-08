@@ -1,23 +1,80 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, TouchableOpacity, ImageBackground } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton, TextInput } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
-//s3
-const CheckIQ2 = () => {
-    const navigation = useNavigation();
-    // const [searchQuery, setSearchQuery] = React.useState('');
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-    // const onChangeSearch = query => setSearchQuery(query);
+//s3
+const CheckIQ2 = ({ navigation, route }) => {
+    const { IQCheck4 } = route.params;
+    const { test2 } = route.params;
+   
+    // Function to handle the press events
+    
+    const handlePress = async (selectedOption) => {
+        let IQpzl3 = 'false';
+
+        if (selectedOption === 2) {
+            IQpzl3 = 'true';
+        }
+        const test3 = { ...test2, IQpzl3 };
+        console.log(test3);
+        function calculatePercentage(obj) {
+            const totalCount = Object.keys(obj).length;
+            let trueCount = 0;
+
+            // Count the number of true values in the object
+            for (const key in obj) {
+                if (obj[key] === 'true') {
+                    trueCount++;
+                }
+            }
+
+            // Calculate the percentage
+            const percentage = (trueCount / totalCount) * 100;
+
+            return percentage;
+        }
+        const iq = calculatePercentage(test3);
+        console.log(iq);
+        const IQCheck5 = { iq };
+        console.log(IQCheck5);
+
+        try {
+            // Get the cached current student ID from AsyncStorage
+            const StudentID = await AsyncStorage.getItem('CurrentstudentID');
+
+            // Check if the currentStudentID is available in AsyncStorage
+            if (StudentID) {
+                // Use the currentStudentID in the API URL for updating student IQ
+                const updateApiUrl = `http://192.168.1.2:8000/api/student/update/${StudentID}`;
+                const response = await axios.put(updateApiUrl, IQCheck4);
+                console.log('Success updated student IQ:', response.data);
+                navigation.navigate('BehaviorCheck1');
+            } else {
+                console.log('Current student ID not found in AsyncStorage.');
+            }
+        } catch (error) {
+            console.error('Error posting data:', error);
+        }
+    };
+
+
+
+   
+
+    
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
             <AppBa2 title={'Check IQ level'} />
             <View style={styles.box1}>
                 <View style={styles.box2}>
-                    <ProgressBar progress={0.9} color='#21005D'  />
+                    <ProgressBar progress={0.9} color='#002060'  />
                 </View>
 
                 <View style={styles.box3}>
@@ -32,7 +89,7 @@ const CheckIQ2 = () => {
                     <View style={styles.input} >
 
                         <View style={styles.group} >
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => handlePress(1)}>
                                 <ImageBackground
                                     source={require('../assets/image/Puzzles/Q3_secondary/Ans1.png')} // Replace this with the path to your image
                                     style={styles.imageBackground}
@@ -40,7 +97,7 @@ const CheckIQ2 = () => {
 
                                 </ImageBackground>
                             </TouchableOpacity>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => handlePress(2)}>
                                 <ImageBackground
                                     source={require('../assets/image/Puzzles/Q3_secondary/Ans2.png')} // Replace this with the path to your image
                                     style={styles.imageBackground}
@@ -50,7 +107,7 @@ const CheckIQ2 = () => {
                             </TouchableOpacity>
                         </View>
                         <View style={styles.group} >
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => handlePress(3)}>
                                 <ImageBackground
                                     source={require('../assets/image/Puzzles/Q3_secondary/Ans3.png')} // Replace this with the path to your image
                                     style={styles.imageBackground}
@@ -58,7 +115,7 @@ const CheckIQ2 = () => {
 
                                 </ImageBackground>
                             </TouchableOpacity>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => handlePress(4)}>
                                 <ImageBackground
                                     source={require('../assets/image/Puzzles/Q3_secondary/Ans4.png')} // Replace this with the path to your image
                                     style={styles.imageBackground}
@@ -79,7 +136,7 @@ const CheckIQ2 = () => {
                 </View>
 
                 <View style={styles.box4}>
-                    <Button textColor='#ffff' onPress={() => { navigation.navigate('BehaviorCheck1') }} mode='contained'>CONTINUE</Button>
+                    <Button textColor='#ffff' onPress={() => handlePress()} mode='contained'>CONTINUE</Button>
                 </View>
             </View>
 

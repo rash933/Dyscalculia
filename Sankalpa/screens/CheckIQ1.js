@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image,TouchableOpacity, ImageBackground } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton, TextInput } from 'react-native-paper';
@@ -6,19 +6,29 @@ import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 //s2
-const CheckIQ1 = () => {
+const CheckIQ1 = ({ navigation, route }) => {
+    const { IQCheck4 } = route.params;
 
-    const navigation = useNavigation();
-    // const [searchQuery, setSearchQuery] = React.useState('');
 
-    // const onChangeSearch = query => setSearchQuery(query);
+    // Function to handle the press events
+    const handlePress = (selectedOption) => {
+        let IQpzl1 = 'false';
+
+        if (selectedOption === 2) {
+            IQpzl1 = 'true';
+        }
+        const test1 = { IQpzl1 };
+        console.log(test1);
+        // Navigate to the next screen (Profile2) with the parameters
+        navigation.navigate('CheckIQ3', { IQCheck4, test1 });
+    };
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
             <AppBa2 title={'Check IQ level'} />
             <View style={styles.box1}>
                 <View style={styles.box2}>
-                    <ProgressBar progress={0.6} color='#21005D'  />
+                    <ProgressBar progress={0.6} color='#002060'  />
                 </View>
 
                 <View style={styles.box3}>
@@ -31,7 +41,7 @@ const CheckIQ1 = () => {
                     />
 
                     <View style={styles.input} >
-                        <TouchableOpacity onPress={() => { navigation.navigate('CheckIQ2') }}>
+                        <TouchableOpacity onPress={() => handlePress(1)}>
                             <ImageBackground
                                 source={require('../assets/image/Puzzles/Q2_secondary/Ans1.png')} // Replace this with the path to your image
                                 style={styles.imageBackground}
@@ -39,7 +49,7 @@ const CheckIQ1 = () => {
                                 
                             </ImageBackground>
                         </TouchableOpacity>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => handlePress(2)}>
                             <ImageBackground
                                 source={require('../assets/image/Puzzles/Q2_secondary/Ans2.png')} // Replace this with the path to your image
                                 style={styles.imageBackground}
@@ -47,7 +57,7 @@ const CheckIQ1 = () => {
 
                             </ImageBackground>
                         </TouchableOpacity>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => handlePress(3)}>
                             <ImageBackground
                                 source={require('../assets/image/Puzzles/Q2_secondary/Ans3.png')} // Replace this with the path to your image
                                 style={styles.imageBackground}
@@ -57,7 +67,7 @@ const CheckIQ1 = () => {
                         </TouchableOpacity>
 
                    
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => handlePress(4)}>
                             <ImageBackground
                                 source={require('../assets/image/Puzzles/Q2_secondary/Ans4.png')} // Replace this with the path to your image
                                 style={styles.imageBackground}

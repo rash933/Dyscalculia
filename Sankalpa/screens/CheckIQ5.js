@@ -1,22 +1,34 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, TouchableOpacity, ImageBackground } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton, TextInput } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
 
-const CheckIQ5 = () => {
+const CheckIQ5 = ({ navigation, route }) => {
+    const { IQCheck4 } = route.params;
+    const { test1 } = route.params;
+   
 
-    // const [searchQuery, setSearchQuery] = React.useState('');
+    // Function to handle the press events
+    const handlePress = (selectedOption) => {
+        let IQpzl2 = 'false';
 
-    // const onChangeSearch = query => setSearchQuery(query);
+        if (selectedOption === 2) {
+            IQpzl2 = 'true';
+        }
+        const test2 = { ...test1, IQpzl2 };
+        console.log(test2);
+        // Navigate to the next screen (Profile2) with the parameters
+        navigation.navigate('CheckIQ6', { IQCheck4, test2 });
+    };
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
             <AppBa2 title={' Check IQ level'} />
             <View style={styles.box1}>
                 <View style={styles.box2}>
-                    <ProgressBar progress={0.6} color='#21005D'  />
+                    <ProgressBar progress={0.6} color='#002060'  />
                 </View>
 
                 <View style={styles.box3}>
@@ -31,7 +43,7 @@ const CheckIQ5 = () => {
                     <View style={styles.input} >
 
                         <View style={styles.group} >
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => handlePress(1)}>
                                 <ImageBackground
                                     source={require('../assets/image/Puzzles/Q2_primary/ans1.png')} // Replace this with the path to your image
                                     style={styles.imageBackground}
@@ -39,7 +51,7 @@ const CheckIQ5 = () => {
 
                                 </ImageBackground>
                             </TouchableOpacity>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => handlePress(2)}>
                                 <ImageBackground
                                     source={require('../assets/image/Puzzles/Q2_primary/ans2.png')} // Replace this with the path to your image
                                     style={styles.imageBackground}
@@ -49,7 +61,7 @@ const CheckIQ5 = () => {
                             </TouchableOpacity>
                         </View>
                         <View style={styles.group} >
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => handlePress(3)}>
                                 <ImageBackground
                                     source={require('../assets/image/Puzzles/Q2_primary/ans3.png')} // Replace this with the path to your image
                                     style={styles.imageBackground}
@@ -57,7 +69,7 @@ const CheckIQ5 = () => {
 
                                 </ImageBackground>
                             </TouchableOpacity>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => handlePress(4)}>
                                 <ImageBackground
                                     source={require('../assets/image/Puzzles/Q2_primary/ans4.png')} // Replace this with the path to your image
                                     style={styles.imageBackground}

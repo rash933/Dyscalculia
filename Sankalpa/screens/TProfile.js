@@ -1,97 +1,107 @@
-import * as React from 'react';
-
-
 import { StyleSheet, View, Image } from "react-native";
 import { Button, Text } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const TProfileScreen = () => {
+    const CurrentTeacherID =  AsyncStorage.getItem('CurrentTeacherID');
+    const [teacherData, setTeacherData] = useState(null);
+    const [studentCount, setStudentCount] = useState(0);
+    const [highLevelStudentCount, setHighLevelStudentCount] = useState(0);
 
+    useEffect(() => {
+        axios.post('http://192.168.1.2:8000/api/studentby', {
+            TeacherID: "CurrentTeacherID"
+        })
+            .then(response => {
+                const students = response.data;
+                setStudentCount(students.length);
+                const highLevelStudents = students.filter(student => student.LevelStatus === "high");
+                setHighLevelStudentCount(highLevelStudents.length);
+            })
+            .catch(error => {
+                console.error('Error fetching student data:', error);
+            });
+
+        fetchTeacherData();
+    }, []);
+
+    const fetchTeacherData = async () => {
+        try {
+            const CurrentTeacherID = await AsyncStorage.getItem('CurrentTeacherID');
+            if (CurrentTeacherID) {
+                const response = await axios.post('http://192.168.1.2:8000/api/teachersby', {
+                    _id: CurrentTeacherID,
+                });
+                const teacher = response.data[0];
+                setTeacherData(teacher);
+                // Now set the TID state with the CurrentTeacherID
+                
+            } else {
+                console.error('CurrentTeacherID not found in cache.');
+            }
+        } catch (error) {
+            console.error('Error fetching teacher data:', error);
+        }
+    };
 
     return (
         <View style={styles.container}>
-            <View>
-                <View style={styles.box0}>
-                    <Image
-                        source={require("../assets/image/person.png")}
-                        resizeMode="contain"
-                        style={styles.image}
-                    />
-                    <View>
-                        <Text style={styles.Name}>
-                            Chanu Gamage
-                        </Text>
-                        <Text style={styles.subtitle}>
-                            I am Primary Teacher
-                        </Text>
-             
-                        <View style={styles.Row}>
-                            <View style={styles.left}>
-                                <Text style={styles.Email}>E mail:  </Text>
-
-                            </View>
-                            <View style={styles.right}>
-
-
-
-                                <Text style={styles.EmailADDress}> Chanugamage@gmail.comssssssssssssssssssssssssssssssssssssss   </Text>
-
-                            </View>
-
-                        </View>
-                        <View style={styles.Row}>
-                            <View style={styles.left}>
-                                <Text style={styles.SmallText}>Total No.Of dyscalculia student   </Text>
-
-                            </View>
-                            <View style={styles.right}>
-
-
-
-                                <View style={styles.group}>
-                                    <View style={styles.box6}>
-                                        <Text style={styles.smallText1}>
-                                          60
-                                        </Text>
-                                       
-                                    </View>
+            {teacherData && (
+                <View>
+                    <View style={styles.box0}>
+                        <Image
+                            source={require("../assets/image/person.png")}
+                            resizeMode="contain"
+                            style={styles.image}
+                        />
+                        <View>
+                            <Text style={styles.Name}>{teacherData.Name}</Text>
+                            <Text style={styles.subtitle}>
+                                {teacherData.StageStatus ? 'Middle School' : 'Primary School'} Teacher
+                            </Text>
+                            <View style={styles.Row}>
+                                <View style={styles.left}>
+                                    <Text style={styles.Email}>E mail: </Text>
                                 </View>
-
+                                <View style={styles.right}>
+                                    <Text style={styles.EmailADDress}>{teacherData.Email}</Text>
+                                </View>
                             </View>
 
-                        </View>
-                        <View style={styles.Row}>
-                            <View style={styles.left}>
-                                <Text style={styles.SmallText}>Total No.Of assigned dyscalculia student    </Text>
-
-                            </View>
-                            <View style={styles.right}>
-
-
-
-                                <View style={styles.group}>
-                                    <View style={styles.box6}>
-                                        <Text style={styles.smallText2}>
-                                          25
-                                        </Text>
-                                     
+                            <View style={styles.Row}>
+                                <View style={styles.left}>
+                                    <Text style={styles.SmallText}>Total No.Of dyscalculia student </Text>
+                                </View>
+                                <View style={styles.right}>
+                                    <View style={styles.group}>
+                                        <View style={styles.box6}>
+                                            <Text style={styles.smallText1}>{studentCount}</Text>
+                                        </View>
                                     </View>
                                 </View>
                             </View>
 
+                            <View style={styles.Row}>
+                                <View style={styles.left}>
+                                    <Text style={styles.SmallText}>Total No.Of assigned dyscalculia student </Text>
+                                </View>
+                                <View style={styles.right}>
+                                    <View style={styles.group}>
+                                        <View style={styles.box6}>
+                                            <Text style={styles.smallText2}>{highLevelStudentCount}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
                         </View>
                     </View>
-
-                    {/* <View style={styles.box}>
-                  
-
-                    </View> */}
-
-
                 </View>
-            </View>
+            )}
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     margin: {

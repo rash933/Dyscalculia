@@ -12,6 +12,7 @@ import AppBa from './appBar';
 import StdProfileScreen from '../screens/SProfile';
 import TTermsScreen from '../screens/TTerms';
 import StuProfile from '../screens/StudentProfile';
+import { BackHandler } from 'react-native';
 
 // const homeName = 'Home';
 // const termsName = 'Terms';
@@ -24,6 +25,7 @@ import StuProfile from '../screens/StudentProfile';
 const Tab = createBottomTabNavigator();
 
 const SNavBar = () => {
+    
     const theme = useTheme();
     const [visible, setVisible] = React.useState(false);
 
@@ -34,6 +36,12 @@ const SNavBar = () => {
     const hideDialog = () => {
         setVisible(false);
     };
+    const handleLogout = () => {
+        // Perform any logout actions or API calls here if needed
+        BackHandler.exitApp();
+        setVisible(false);
+    };
+
 
     return (
 
@@ -53,8 +61,8 @@ const SNavBar = () => {
                         <Dialog.Title style={{ textAlign: 'center', fontWeight: 'bold' }}>LOG OUT !</Dialog.Title>
                         <Text style={{ textAlign: 'center', }} variant="bodyMedium">Are you sure you want to logout</Text>
                         <View style={styles.row}>
-                            <Button mode='contained' style={{ width: 100 }} buttonColor='#21005D' onPress={hideDialog}>Yes</Button>
-                            <Button mode='contained' style={{ width: 100 }} buttonColor='#21005D' onPress={hideDialog}>No</Button>
+                            <Button mode='contained' style={{ width: 100 }} buttonColor='#002060' onPress={handleLogout}>Yes</Button>
+                            <Button mode='contained' style={{ width: 100 }} buttonColor='#002060' onPress={hideDialog}>No</Button>
 
                         </View>
                     </Dialog.Content>

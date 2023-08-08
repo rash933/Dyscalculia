@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Avatar, Divider, IconButton, Card, Text, Button, TextInput,RadioButton } from 'react-native-paper';
 import Background1 from '../components/background1';
 import { useNavigation } from '@react-navigation/core';
 
-const Registation2 = () => {
-    const navigation = useNavigation();
-    const [value, setValue] = React.useState('Primary School  ');
+const Registation2 = ({ navigation, route }) => {
+    const { userData } = route.params;
+    const [stagestatus, setValue] = React.useState('true');
+    const Next = () => {
+        const updateUserData = { ...userData, stagestatus };
+       
+        console.log(updateUserData);
+        // Navigate to the next screen (InputScreen2)
+        navigation.navigate('Registation3', { updateUserData });
+    };
     return (
         <View style={styles.container}>
             <Background1 />
@@ -14,7 +21,7 @@ const Registation2 = () => {
 
             <View style={styles.InputBox}>
                 <Text style={styles.headerText}>Registration</Text>
-                <RadioButton.Group onValueChange={value => setValue(value)} value={value}>
+                <RadioButton.Group onValueChange={value => setValue(value)} value={stagestatus}>
                    
 
                 <View style={styles.input} >
@@ -22,12 +29,12 @@ const Registation2 = () => {
                        
                     <View style={styles.textFeild}>
                             <Card mode='outlined' style={{ width: 250, }}>
-                                <RadioButton.Item label="Primary School" labelStyle='titleMedium'  value="Primary School  " />
+                                <RadioButton.Item label="Primary School"  labelStyle='titleMedium' value="false" />
                             </Card>
                     </View>
                     <View style={styles.textFeild}>
                             <Card mode='outlined' style={{ width: 250, }}>
-                                <RadioButton.Item label="  Middle School  " labelStyle='titleMedium' value="Middle School  " />
+                                <RadioButton.Item label="  Middle School  " labelStyle='titleMedium' value="true" />
                             </Card>
                     </View>
                         <View style={styles.textFeild}>
@@ -38,7 +45,7 @@ const Registation2 = () => {
                 </RadioButton.Group>
 
                 <View style={styles.buttonBox}  >
-                    <Button style={styles.button} textColor='#ffff' mode="contained" onPress={() => { navigation.navigate('Registation3') }}>
+                    <Button style={styles.button} textColor='#ffff' mode="contained" onPress={Next}>
                         Next
                     </Button>
                     <View style={styles.row} >

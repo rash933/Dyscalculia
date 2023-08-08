@@ -3,9 +3,9 @@ import { ActivityIndicator, View } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
 import * as ScreenOrientation from 'expo-screen-orientation';
 
-const Loader = () => {
-    const navigation = useNavigation();
-
+const Loader2 = ({ navigation, route }) => {
+ 
+    const { markId } = route.params;
     useEffect(() => {
         // Wait for 1 minute and then navigate to another page
         const timer = setTimeout(() => {
@@ -13,7 +13,7 @@ const Loader = () => {
             ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
 
             // Navigate to the 'StuResults' page
-            navigation.navigate('SNavBar');
+            navigation.navigate('StuResults', { markId });
         }, 300); // 300 milliseconds for demonstration purposes; replace with 60000 for 1 minute
 
         return () => clearTimeout(timer);
@@ -25,4 +25,4 @@ const Loader = () => {
     );
 };
 
-export default Loader;
+export default Loader2;

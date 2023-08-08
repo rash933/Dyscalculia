@@ -3,9 +3,11 @@ import { StyleSheet, Text, View } from 'react-native';
 import PieChart from 'react-native-pie-chart';
 
 export default class StudentChart extends Component {
+    
     render() {
         const widthAndHeight = 140;
-        const series = [8,2, 5, 10];
+        const { totalCount, highLevelCount, highMediumLevelCount, lowLevelCount, lowMediumLevelCount } = this.props;
+        const series = [highLevelCount, highMediumLevelCount, lowLevelCount, lowMediumLevelCount];
         const sliceColor = ['#DFAA21', '#24DA20', '#5040A3', '#A34040'];
 
         return (
@@ -19,7 +21,7 @@ export default class StudentChart extends Component {
                         coverFill={'transparent'}
                     />
                     <Text style={styles.chartText}>Total No. of
-                        {"\n"}Student{"\n"}25</Text>
+                        {"\n"}Student{"\n"}{totalCount}</Text>
                 </View>
             </View>
         );

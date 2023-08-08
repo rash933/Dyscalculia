@@ -1,55 +1,77 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/core';
+import axios from 'axios';
 
-const VerifyStudent = () => {
-    const navigation = useNavigation();
-    // const [searchQuery, setSearchQuery] = React.useState('');
+const VerifyStudent = ({ navigation, route }) => {
+    const { studentId } = route.params;
+    const [studentData, setStudentData] = useState(null); // This will hold the student data
 
-    // const onChangeSearch = query => setSearchQuery(query);
+    // Function to fetch student data by ID
+    useEffect(() => {
+        const fetchStudentData = async () => {
+            try {
+                const response = await axios.post('http://192.168.1.2:8000/api/studentby', {
+                    _id: studentId,
+                });
+                setStudentData(response.data[0]); // Assuming the API returns an array with a single student object
+            } catch (error) {
+                console.error('Error fetching student data:', error);
+            }
+        };
+
+        fetchStudentData();
+    }, [studentId]);
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US');
+    };
+
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
             <AppBa2 title={'Verify student details'} />
             <View style={styles.box1}>
                 <View style={styles.box2}>
-                    <ProgressBar progress={0.1} color='#21005D'  />
+                    <ProgressBar progress={0.1} color="#002060" />
                 </View>
 
                 <View style={styles.box3}>
+                    {studentData && (
+                        <Card mode="outlined" style={styles.card}>
+                            <Card.Title
+                                title={studentData.Name}
+                                subtitle={studentData.StageStatus ? 'Middle School' : 'Primary School'}
+                                left={(props) => <Avatar.Text {...props} label={studentData.Name[0]} />}
+                                right={(props) => <IconButton {...props} icon="dots-vertical" onPress={() => { }} />}
+                            />
 
-                    <Card mode='outlined' style={styles.card}>
-                        <Card.Title
-                            title="Card Title"
-                            subtitle="Card Subtitle"
-                            left={(props) => <Avatar.Text {...props} label="A" />}
-                            right={(props) => <IconButton {...props} icon="dots-vertical" onPress={() => { }} />}
-                        />
-
-                        <Card.Content>
-                            <Text variant="headlineMedium">Card title</Text>
-                            <Text variant="titleMedium">content</Text>
-                            <Text variant="bodyMedium">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do</Text>
-                        </Card.Content>
-
-                      
-                    </Card>
+                            <Card.Content>
+                                <Text variant="headlineMedium">Details</Text>
+                                <Text variant="titleMedium">Birth Date:  {formatDate(studentData.Dob)}</Text>
+                                <Text variant="titleMedium">Email:  {studentData.Email}</Text>
+                                <Text variant="titleMedium">IQ Results :  {studentData.Iq}</Text>
+                                <Text variant="titleMedium">Child Behavior Marks:  {studentData.ParentQ}</Text>
+                                <Text variant="titleMedium">Quiz:  {studentData.Quiz}</Text>
+                                {/* Display any other student details here */}
+                            </Card.Content>
+                        </Card>
+                    )}
                     <View style={styles.note}>
-                        <Text variant="titleMedium">** Please confirm the student details before start the predication</Text>
+                        <Text variant="titleMedium">** Please confirm the student details before starting the prediction</Text>
                     </View>
-
-
                 </View>
 
                 <View style={styles.box4}>
-                    <Button textColor='#ffff' mode='contained' onPress={() => { navigation.navigate('StudentMarks') }}>Confirm Details </Button>
+                    <Button textColor="#ffff" mode="contained" onPress={() => { navigation.navigate('StudentMarks', { studentId }) }}>
+                        Confirm Details
+                    </Button>
                 </View>
             </View>
-
         </View>
     );
 };
@@ -69,7 +91,8 @@ const styles = StyleSheet.create({
         marginRight: 23,
         justifyContent: 'center',
         alignContent: 'center',
-        textAlign: 'center'
+        textAlign: 'center',
+        
     },
     box2: {
         height: 30,
@@ -85,11 +108,10 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexdirection: 'column',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        
         textAlign: 'center',
         height: 500,
-        marginLeft: 10,
-        marginRight: 10,
+       
         // backgroundColor:'#000'  
 
     },

@@ -1,29 +1,76 @@
-import React from 'react';
-import { StyleSheet, View } from "react-native";
-import { Avatar, Divider, IconButton, Card, Text, Button, TextInput } from 'react-native-paper';
+import React, { useState, useEffect } from "react";
+import { StyleSheet, View, Keyboard } from "react-native";
+import { Avatar, Divider, IconButton, Card, Text, Button, TextInput, PaperProvider, RadioButton } from 'react-native-paper';
 import Background1 from '../components/background1';
 import { useNavigation } from '@react-navigation/core';
 
-const Registation1 = () => {
-    const navigation = useNavigation();
+
+const Registation1 = ({ navigation }) => {
+
+    const [role, setValue] = React.useState('true');
+    const [dob, setdob] = useState('');
+    const [name, setname] = useState('');
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+    const [dobError, setDobError] = useState(false);
+    const [nameError, setNameError] = useState(false);
+
+
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardVisible(true);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardVisible(false);
+        });
+
+        return () => {
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, []);
+
+    const handleNameChange = (text) => {
+        setname(text);
+        // Check for letters only using a regular expression
+        const lettersOnly = /^[A-Za-z]+$/;
+        setNameError(!lettersOnly.test(text));
+    };
+
+    const handleDOBChange = (text) => {
+        setdob(text);
+        // Check for the correct format using a regular expression
+        const dobFormat = /^\d{4}-\d{2}-\d{2}$/;
+        setDobError(!dobFormat.test(text));
+    };
+    
+    const Next = () => {
+        // Save the inputs in a global state or context
+        // You can use Redux, context, or a state management library for this purpose
+        const userData = { role, dob, name };
+        console.log(userData);
+        // Navigate to the next screen (InputScreen2)
+        navigation.navigate('Registation2', { userData });
+    };
+
     return (
+
         <View style={styles.container}>
-            <Background1 />
+            {!isKeyboardVisible && <Background1 />}
 
 
             <View style={styles.InputBox}>
                 <Text style={styles.headerText}>Registration</Text>
                 <View style={styles.input} >
                     <View style={styles.textFeild}>
-                        <Text style={{ textAlign: 'left' }} variant="labelLarge">Student Name</Text>
-                        <TextInput style={{ width: 250 }}
-                            mode="outlined"
-                            outlineColor='#000'
-                            label=""
-                            // placeholder="Type something"
-                           
-                        />
-                        <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="labelLarge"> Letters only</Text>
+                        <Text style={{ textAlign: 'left' }} variant="labelLarge">User Role</Text>
+                        <RadioButton.Group onValueChange={value => setValue(value)} value={role} >
+
+                            <View style={{ width: 250, display: 'flex', flexDirection: 'row', justifyContent: '', borderColor: '#000', borderWidth: 1, borderRadius: 4 }}>
+                                <RadioButton.Item label="Student" value="true" position='leading' />
+                                <RadioButton.Item label="Teacher" value="false" position='leading' />
+                            </View>
+                        </RadioButton.Group>
+
                     </View>
                     <View style={styles.textFeild}>
                         <Text style={{ textAlign: 'left' }} variant="labelLarge">Date Of Birth</Text>
@@ -31,31 +78,42 @@ const Registation1 = () => {
                             mode="outlined"
                             outlineColor='#000'
                             label=""
-                            // placeholder="Type something"
-                           
+                            value={dob}
+                            onChangeText={handleDOBChange}
+                        // placeholder="Type something"
+
                         />
-                        <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="labelLarge">Incorrect format ( "xxxx-xx-xx")</Text>
+                        {dobError && (
+                            <Text style={{ textAlign: 'left', color: '#ec0b43' }}>
+                                Incorrect format ("xxxx-xx-xx")
+                            </Text>
+                        )}
+
                     </View>
+
                     <View style={styles.textFeild}>
-                        <Text style={{ textAlign: 'left' }} variant="labelLarge">Name of the Parent</Text>
-                        <TextInput style={{ width: 250 }}
+                        <Text style={{ textAlign: 'left' }}>Name of the user</Text>
+                        <TextInput
+                            style={{ width: 250 }}
                             mode="outlined"
-                            outlineColor='#000'
+                            outlineColor="#000"
                             label=""
-                            // placeholder="Type something"
-                           
+                            value={name}
+                            onChangeText={handleNameChange}
                         />
-                        <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="labelLarge">Letters Only</Text>
+                        {nameError && (
+                            <Text style={{ textAlign: 'left', color: '#ec0b43' }}>Letters Only</Text>
+                        )}
                     </View>
 
                 </View>
 
                 <View style={styles.buttonBox}  >
-                    <Button style={styles.button} textColor='#ffff' mode="contained" onPress={() => { navigation.navigate('Registation2') }}>
+                    <Button style={styles.button} textColor='#ffff' buttonColor='#002060' mode="contained" onPress={Next}>
                         Next
                     </Button>
                     <View style={styles.row} >
-                        
+
                     </View>
                 </View>
 
@@ -63,6 +121,7 @@ const Registation1 = () => {
 
 
         </View>
+
     );
 }
 

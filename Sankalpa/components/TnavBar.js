@@ -11,6 +11,7 @@ import TTermsScreen from '../screens/TTerms';
 import TLogOutScreen from '../screens/TProfile';
 import AppBa from './appBar';
 import TProfileScreen from '../screens/TProfile';
+import { BackHandler } from 'react-native';
 
 
 // const homeName = 'Home';
@@ -30,6 +31,12 @@ const TNavBar = ( ) =>  {
     const hideDialog = () => {
         setVisible(false);
     };
+    const handleLogout = () => {
+        // Perform any logout actions or API calls here if needed
+        BackHandler.exitApp();
+        setVisible(false);
+    };
+
    
     return (
        
@@ -49,8 +56,8 @@ const TNavBar = ( ) =>  {
                             <Dialog.Title style={{ textAlign: 'center', fontWeight: 'bold' }}>LOG OUT !</Dialog.Title>
                             <Text style={{ textAlign: 'center',  }} variant="bodyMedium">Are you sure you want to logout</Text>
                             <View style={styles.row}>
-                                <Button mode='contained' style={{width:100 }} buttonColor='#21005D' onPress={hideDialog}>Yes</Button>
-                                <Button mode='contained' style={{ width:100 }} buttonColor='#21005D' onPress={hideDialog}>No</Button>
+                            <Button mode='contained' style={{ width: 100 }} buttonColor='#002060' onPress={handleLogout}>Yes</Button>
+                                <Button mode='contained' style={{ width:100 }} buttonColor='#002060' onPress={hideDialog}>No</Button>
 
                             </View>
                         </Dialog.Content>

@@ -1,29 +1,44 @@
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground,BackHandler } from 'react-native';
 import { Avatar, Divider, IconButton, Card, Text, Button } from 'react-native-paper';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import THomeScreen from './THome';
 import AppBa2 from '../components/appBar2';
 import AppBa3 from '../components/appBa3';
 
-const GamePage18 = () => {
+const GamePage18 = ({ navigation, route }) => {
+    const { G7 } = route.params;
+
+    const handlePress = (selectedOption) => {
+        let g8Value = 'false';
+
+        if (selectedOption === 1) {
+            g8Value = 'true';
+        }
+
+        const G8 = { ...G7, g8: g8Value };
+        console.log(G8);
+        // Navigate to the next screen (Profile2) with the parameters
+        navigation.navigate('GamePage19', { G8 });
+    };
+
     useEffect(() => {
-        // Lock the orientation to landscape mode when the component is mounted
+        // Lock the screen orientation to landscape
         ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
 
-        // Clean up the orientation lock when the component is unmounted
+        // Handle back button press
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            // Exit the app when the back button is pressed
+            BackHandler.exitApp();
+            return true; // Prevent default behavior (going back to the previous screen)
+        });
+
         return () => {
-            ScreenOrientation.lockAsync();
+            // Remove the back button event listener when the component unmounts
+            backHandler.remove();
         };
-    }, []);
-
-    const handleGoBack = () => {
-        // Unlock the orientation before leaving the page
-        ScreenOrientation.lockAsync();
-
-        // You can implement your custom logic to go back or exit the current screen here
-    };
+    }, []); 
 
     return (
         <ImageBackground blurRadius={2}
@@ -33,7 +48,7 @@ const GamePage18 = () => {
         >
             <View>
                 <StatusBar style="inverted" />
-                <AppBa3 title={'Quiz 1 '} />
+                <AppBa3 title={'Quiz  '} />
 
 
                 <View style={styles.container}>
@@ -51,7 +66,7 @@ const GamePage18 = () => {
                                 <Text style={styles.largeText} variant="displayLarge">1097 - 1067 = 20</Text>
 
                                 <View style={styles.Bgroup} >
-                                    <TouchableOpacity>
+                                    <TouchableOpacity onPress={() => handlePress(1)}>
                                         <ImageBackground
                                             source={require('../assets/image/CorrectButton.png')} // Replace this with the path to your image
                                             style={styles.imageBackground}
@@ -59,7 +74,7 @@ const GamePage18 = () => {
 
                                         </ImageBackground>
                                     </TouchableOpacity>
-                                    <TouchableOpacity>
+                                    <TouchableOpacity onPress={() => handlePress(2)}>
                                         <ImageBackground
                                             source={require('../assets/image/WrongButton.png')} // Replace this with the path to your image
                                             style={styles.imageBackground}

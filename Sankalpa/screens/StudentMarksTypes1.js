@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton,TextInput } from 'react-native-paper';
@@ -6,50 +6,78 @@ import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-const StudentMarks = () => {
-    const navigation = useNavigation();
-    // const [searchQuery, setSearchQuery] = React.useState('');
 
-    // const onChangeSearch = query => setSearchQuery(query);
+
+
+const StudentMarks = ({ navigation, route }) => {
+    const { studentId } = route.params;
+    const [performancem, setPerformanceMarks] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
+
+    // Function to validate performance marks input
+    const validateInput = () => {
+        const marks = parseFloat(performancem);
+        if (isNaN(marks) || marks < 0 || marks > 100) {
+            setErrorMsg('Marks range should be between 0 to 100');
+            return false;
+        }
+        setErrorMsg('');
+        return true;
+    };
+
+    // Function to handle navigation to the next screen
+    const handleContinue = () => {
+        if (validateInput()) {
+            const Mlist1 = { studentid: route.params.studentId, performancem };
+            console.log('Mlist1:', Mlist1); // <-- Print Mlist1 in the console
+            navigation.navigate('StudentMarks2', { Mlist1 });
+        }
+    };
+
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
             <AppBa2 title={' In-class activity details'} />
             <View style={styles.box1}>
                 <View style={styles.box2}>
-                    <ProgressBar progress={0.2} color='#21005D'  />
+                    <ProgressBar progress={0.2} color="#002060" />
                 </View>
 
                 <View style={styles.box3}>
-
-                    <Text style={{textAlign:'center'}} variant="headlineLarge">Enter student’s
-                        class performance marks </Text>
-                    <View style={styles.input} >
-                        <Text style={{ textAlign: 'left' }} variant="titleMedium">Performance marks</Text>
-                        <TextInput style={{ width: 250 }}
+                    <Text style={{ textAlign: 'center' }} variant="headlineLarge">
+                        Enter student’s class performance marks
+                    </Text>
+                    <View style={styles.input}>
+                        <Text style={{ textAlign: 'left' }} variant="titleMedium">
+                            Performance marks
+                        </Text>
+                        <TextInput
+                            style={{ width: 250 }}
                             mode="outlined"
-                            outlineColor='#000'
+                            outlineColor="#000"
                             label=""
-                            // placeholder="Type something"
-                         
+                            value={performancem}
+                            onChangeText={(text) => setPerformanceMarks(text)}
+                            keyboardType="numeric"
                         />
-                        <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">Marks range : 0-100</Text>
-                     </View>
-                   
-                    
-                    <View style={styles.note}>
-                        <Text variant="titleMedium">** Please enter correct input for predict student 
-                            skill level </Text>
+                        {errorMsg ? (
+                            <Text style={{ textAlign: 'left', color: '#ec0b43' }} variant="titleMedium">
+                                {errorMsg}
+                            </Text>
+                        ) : null}
                     </View>
 
-
+                    <View style={styles.note}>
+                        <Text variant="titleMedium">** Please enter correct input for predict student skill level </Text>
+                    </View>
                 </View>
 
                 <View style={styles.box4}>
-                    <Button textColor='#ffff' onPress={() => { navigation.navigate('StudentMarks2') }} mode='contained'>CONTINUE</Button>
+                    <Button textColor="#ffff" onPress={handleContinue} mode="contained">
+                        CONTINUE
+                    </Button>
                 </View>
             </View>
-
         </View>
     );
 };

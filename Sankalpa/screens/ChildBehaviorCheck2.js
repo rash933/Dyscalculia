@@ -6,18 +6,42 @@ import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-const BehaviorCheck2 = () => {
+const BehaviorCheck2 = ({ navigation, route }) => {
+    const { parentq1 } = route.params;
+
     const [checked1, setChecked1] = React.useState(false);
     const [checked2, setChecked2] = React.useState(false);
     const [checked3, setChecked3] = React.useState(false);
-    const navigation = useNavigation();
+   
+
+    const calculateScore = () => {
+        let score2 = 0;
+        if (checked1) score2 += 10;
+        if (checked2) score2 += 10;
+        if (checked3) score2 += 10;
+        // You can adjust the scoring logic based on your requirements
+        return score2;
+    };
+
+
+    const Next = () => {
+        // Calculate the score
+        const score2 = calculateScore();
+
+        // Update the parentq1 object with the score
+        const parentq2 = { ...parentq1,score2};
+        console.log(parentq2);
+
+        // Navigate to the next screen (BehaviorCheck2) with parentq1 as a parameter
+        navigation.navigate('BehaviorCheck3', { parentq2 });
+    };
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
             <AppBa2 title={'Child behavior'} />
             <View style={styles.box1}>
                 <View style={styles.box2}>
-                    <ProgressBar progress={0.6} color='#21005D' />
+                    <ProgressBar progress={0.6} color='#002060' />
                 </View>
 
                 <View style={styles.box3}>
@@ -49,7 +73,7 @@ const BehaviorCheck2 = () => {
                 </View>
 
                 <View style={styles.box4}>
-                    <Button textColor='#ffff' onPress={() => { navigation.navigate('BehaviorCheck3') }} mode='contained'>CONTINUE</Button>
+                    <Button textColor='#ffff' onPress={Next} mode='contained'>CONTINUE</Button>
                 </View>
             </View>
 

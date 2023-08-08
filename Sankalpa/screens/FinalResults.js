@@ -1,21 +1,52 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton, TextInput, RadioButton } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
-import { Card } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/core';
+import axios from 'axios';
 
-const FinalResults = () => {
-    const navigation = useNavigation();
-    const [value, setValue] = React.useState('Good');
+const FinalResults = ({ navigation, route }) => {
+    const { markId } = route.params;
+    const [studentData, setStudentData] = useState(null);
+    const [studentName, setStudentName] = useState('');
+    const [stageId, setStageId] = useState('');
+
+    // Get the current date
+    const currentDate = new Date();
+    // Format the date to "YYYY.MM.DD" format
+    const formattedDate = `${currentDate.getFullYear()}.${currentDate.getMonth() + 1}.${currentDate.getDate()}`;
+
+
+    useEffect(() => {
+        fetchStudentDetails(markId);
+    }, []);
+
+    const fetchStudentDetails = async (markId) => {
+        try {
+            // Fetch student details using markId
+            const markResponse = await axios.post('http://192.168.1.2:8000/api/markby', { _id: markId });
+            const studentId = markResponse.data[0].StudentID;
+
+            // Fetch student name and stage ID using studentId
+            const studentResponse = await axios.post('http://192.168.1.2:8000/api/studentby', { _id: studentId });
+            const studentDetails = studentResponse.data[0];
+
+            setStudentData(markResponse.data[0]);
+            setStudentName(studentDetails.Name);
+            setStageId(studentDetails.StageId);
+        } catch (error) {
+            console.error('Error fetching student details:', error);
+        }
+
+    };
+
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
             <AppBa2 title={' Skill Level Results '} />
             <View style={styles.box1}>
                 <View style={styles.box2}>
-                    <ProgressBar progress={0.9} color='#21005D'  />
+                    <ProgressBar progress={0.9} color='#002060'  />
                 </View>
 
                 <View style={styles.box3}>
@@ -23,41 +54,62 @@ const FinalResults = () => {
                     <Text style={{ textAlign: 'center' }} variant="headlineLarge">Student Details</Text>
                     <View style={styles.input} >
 
-                        <Text style={{ marginBottom: 1 }} variant="headlineSmall">Student Name </Text>
-                        <Text style={{ marginBottom: 15 }} variant="titleMedium">Stage Id (Primary / Secondary ) </Text>
+                        <Text style={{ marginBottom: 1 }} variant="headlineSmall">Student Name : {studentName}</Text>
+                        <Text style={{ marginBottom: 25 }} variant="titleMedium"> Stage : {stageId ? 'Middle School' : 'Primary School'} {stageId} </Text>
 
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10 }} variant="titleMedium">Class Test exam Marks :</Text>
-                            <Text style={{ marginBottom: 10 }} variant="titleMedium">39</Text>
-                        </View>
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10 }} variant="titleMedium">Class performance Marks : </Text>
-                            <Text style={{ marginBottom: 10 }} variant="titleMedium">89</Text>
-                        </View>
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10 }} variant="titleMedium">Class Assignment Marks  :</Text>
-                            <Text style={{ marginBottom: 10 }} variant="titleMedium">89</Text>
-                        </View>
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10 }} variant="titleMedium">Class Attendance details :</Text>
-                            <Text style={{ marginBottom: 10 }} variant="titleMedium">78</Text>
-                        </View>
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10, fontWeight: 'bold' }} variant="titleLarge">Skill Level Result  :</Text>
-                            <Text style={{ marginBottom: 10, color: '#ec0b43' }} variant="titleLarge"> Low Level</Text>
-                        </View>
-                        <View style={styles.group} >
-                            <Text style={{ marginBottom: 10 }} variant="titleMedium">Teacher Feedback  :</Text>
-                           
-                           
-                        </View>
-                        <View style={{ height: 80, }}>
-                            <Text style={{ marginBottom: 10 }} variant="titleMedium"  >goodssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss </Text>
-                        </View>
+                        {studentData && (
+                            <>
+                                <View style={styles.group}>
+                                    <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                        Class Test exam Marks:
+                                    </Text>
+                                    <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                        {studentData.TestM}
+                                    </Text>
+                                </View>
+                                <View style={styles.group}>
+                                    <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                        Class performance Marks:
+                                    </Text>
+                                    <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                        {studentData.PerformanceM}
+                                    </Text>
+                                </View>
+                                <View style={styles.group}>
+                                    <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                        Class Assignment Marks:
+                                    </Text>
+                                    <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                        {studentData.AssignmentM}
+                                    </Text>
+                                </View>
+                                <View style={styles.group}>
+                                    <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                        Class Attendance details:
+                                    </Text>
+                                    <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                        {studentData.AttandenceM}
+                                    </Text>
+                                </View>
+                                <View style={styles.group} >
+                                    <Text style={{ marginBottom: 12, fontWeight: 'bold' }} variant="titleLarge">Skill Level Result  :</Text>
+                                    <Text style={{ marginBottom: 12, color: '#ec0b43' }} variant="titleLarge">  {studentData.Prediction}</Text>
+                                </View>
+                                <View style={styles.group} >
+                                    <Text style={{ marginBottom: 10 }} variant="titleMedium">Teacher Feedback  :</Text>
+
+
+                                </View>
+                                <View style={{ height: 80, }}>
+                                    <Text style={{ marginBottom: 10 }} variant="titleMedium"  >{studentData.FeedBack}</Text>
+                                </View>
+                            </>
+                        )}
+                        
  
                         <View style={styles.group} >
                             <Text style={{ marginBottom: 10 }} variant="titleMedium">Date and Time  :</Text>
-                            <Text style={{ marginBottom: 10 }} variant="titleMedium">2001.04.22</Text>
+                            <Text style={{ marginBottom: 10 }} variant="titleMedium">{formattedDate}</Text>
                         </View>
                     </View>
 
@@ -71,8 +123,8 @@ const FinalResults = () => {
 
                 <View style={styles.box4}>
                     <View style={styles.Bgroup} >
-                        <Button textColor='#ffff' mode='contained'>Print Report </Button>
-                        <Button textColor='#ffff' onPress={() => { navigation.navigate('TNavBar') }} mode='contained'>      End       </Button>
+                        {/* <Button textColor='#ffff' mode='contained'>Print Report </Button> */}
+                        <Button textColor='#ffff' onPress={() => { navigation.navigate('TNavBar') }} mode='contained'>          End           </Button>
                     </View>
 
                 </View>

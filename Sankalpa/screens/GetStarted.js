@@ -6,9 +6,9 @@ import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/core';
 
-const GetStartedPage = () => {
+const GetStartedPage = ({ navigation, route }) => {
 
-    const navigation = useNavigation();
+    const { studentId } = route.params;
 
  
     // const [searchQuery, setSearchQuery] = React.useState('');
@@ -56,7 +56,7 @@ const GetStartedPage = () => {
                 </View>
                
                 <View style={styles.box4}>
-                    <Button textColor='#ffff' onPress={() => { navigation.navigate('VerifyStudent') }} mode='contained'>Start Process</Button>
+                    <Button textColor='#ffff' onPress={() => { navigation.navigate('VerifyStudent', { studentId }) }} mode='contained'>Start Process</Button>
                 </View>
             </View>
 

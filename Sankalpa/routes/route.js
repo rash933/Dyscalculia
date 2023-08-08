@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TNavBar from '../components/TnavBar';
@@ -72,11 +71,13 @@ import Instruction from '../screens/instruction';
 import Gamepage2 from '../screens/Gamepage2';
 import GamePage20 from '../screens/Gamepage20';
 import GamePage21 from '../screens/Gamepage21';
+import Loader2 from '../components/loader2';
 
 const Stack = createNativeStackNavigator();
 
 const Routes = () => {
     return (
+      
         <NavigationContainer>
             <Stack.Navigator initialRouteName="FirstPage">
                 <Stack.Screen options={{ headerShown: false }} name="TNavBar" component={TNavBar} />
@@ -96,6 +97,7 @@ const Routes = () => {
                 <Stack.Screen options={{ headerShown: false }} name="StudentAttendence" component={StudentAttendence} />
                 <Stack.Screen options={{ headerShown: false }} name="ConfirmStuDE" component={ConfirmStuDE} />
                 <Stack.Screen options={{ headerShown: false }} name="Loader" component={Loader} />
+                <Stack.Screen options={{ headerShown: false }} name="Loader2" component={Loader2} />
                 <Stack.Screen options={{ headerShown: false }} name="StuResults" component={StuResults} />
                 <Stack.Screen options={{ headerShown: false }} name="TFeeddback" component={TFeeddback} />
                 <Stack.Screen options={{ headerShown: false }} name="FinalResults" component={FinalResults} />
@@ -154,6 +156,7 @@ const Routes = () => {
 
             </Stack.Navigator>
         </NavigationContainer>
+       
     );
 }
 

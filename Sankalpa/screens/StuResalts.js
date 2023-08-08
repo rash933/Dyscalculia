@@ -1,21 +1,44 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, ScrollView, } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton, TextInput, RadioButton } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
-import { Card } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/core';
+import axios from 'axios';
 
-const StuResults = () => {
-    const navigation = useNavigation();
-    const [value, setValue] = React.useState('Good');
+const StuResults = ({ navigation, route }) => {
+    const { markId } = route.params;
+    const [studentData, setStudentData] = useState(null);
+    const [studentName, setStudentName] = useState('');
+    const [stageId, setStageId] = useState('');
+
+    useEffect(() => {
+        fetchStudentDetails(markId);
+    }, []);
+
+    const fetchStudentDetails = async (markId) => {
+        try {
+            // Fetch student details using markId
+            const markResponse = await axios.post('http://192.168.1.2:8000/api/markby', { _id: markId });
+            const studentId = markResponse.data[0].StudentID;
+
+            // Fetch student name and stage ID using studentId
+            const studentResponse = await axios.post('http://192.168.1.2:8000/api/studentby', { _id: studentId });
+            const studentDetails = studentResponse.data[0];
+
+            setStudentData(markResponse.data[0]);
+            setStudentName(studentDetails.Name);
+            setStageId(studentDetails.StageId);
+        } catch (error) {
+            console.error('Error fetching student details:', error);
+        }
+    };
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
             <AppBa2 title={' Skill Level Results '} />
             <View style={styles.box1}>
                 <View style={styles.box2}>
-                    <ProgressBar progress={0.8} color='#21005D' />
+                    <ProgressBar progress={0.8} color='#002060' />
                 </View>
 
                 <View style={styles.box3}>
@@ -23,30 +46,56 @@ const StuResults = () => {
                         <Text style={{ textAlign: 'center' }} variant="headlineLarge">Student 
                             Skill Level predication Report</Text>
                     <View style={styles.input} >
+                            {/* Render student name and stage ID here */}
+                            <Text style={{ marginBottom: 1 }} variant="headlineSmall">
+                                Student Name: {studentName}
+                            </Text>
+                            <Text style={{ marginBottom: 25 }} variant="titleMedium">
+                                Stage : {stageId ? 'Middle School' : 'Primary School'} {stageId}
+                            </Text>
+                            {/* Render other student details from studentData here */}
 
-                            <Text style={{ marginBottom: 1, marginTop: 19 }} variant="headlineSmall">Student Name </Text>
-                            <Text style={{ marginBottom: 25 }} variant="titleMedium">Stage Id (Primary / Secondary ) </Text>
-
-                        <View style={styles.group} >
-                                <Text style={{ marginBottom: 12 }} variant="titleMedium">Class Test exam Marks :</Text>
-                                <Text style={{ marginBottom: 12 }} variant="titleMedium">90</Text>
-                        </View>
-                        <View style={styles.group} >
-                                <Text style={{ marginBottom: 12 }} variant="titleMedium">Class performance Marks : </Text>
-                                <Text style={{ marginBottom: 12 }} variant="titleMedium">90</Text>
-                        </View>
-                        <View style={styles.group} >
-                                <Text style={{ marginBottom: 12 }} variant="titleMedium">Class Assignment Marks  :</Text>
-                                <Text style={{ marginBottom: 12 }} variant="titleMedium">78</Text>
-                        </View>
-                        <View style={styles.group} >
-                                <Text style={{ marginBottom: 12 }} variant="titleMedium">Class Attendance details :</Text>
-                                <Text style={{ marginBottom: 12 }} variant="titleMedium">98</Text>
-                        </View>
-                        <View style={styles.group} >
-                                <Text style={{ marginBottom: 12, fontWeight: 'bold' }} variant="titleLarge">Skill Level Result  :</Text>
-                            <Text style={{ marginBottom: 12, color: '#ec0b43' }} variant="titleLarge"> Low Level</Text>
-                        </View>
+                            {studentData && (
+                                <>
+                                    <View style={styles.group}>
+                                        <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                            Class Test exam Marks:
+                                        </Text>
+                                        <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                            {studentData.TestM}
+                                        </Text>
+                                    </View>
+                                    <View style={styles.group}>
+                                        <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                            Class performance Marks:
+                                        </Text>
+                                        <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                            {studentData.PerformanceM}
+                                        </Text>
+                                    </View>
+                                    <View style={styles.group}>
+                                        <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                            Class Assignment Marks:
+                                        </Text>
+                                        <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                            {studentData.AssignmentM}
+                                        </Text>
+                                    </View>
+                                    <View style={styles.group}>
+                                        <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                            Class Attendance details:
+                                        </Text>
+                                        <Text style={{ marginBottom: 12 }} variant="titleMedium">
+                                            {studentData.AttandenceM}
+                                        </Text>
+                                    </View>
+                                    <View style={styles.group} >
+                                        <Text style={{ marginBottom: 12, fontWeight: 'bold' }} variant="titleLarge">Skill Level Result  :</Text>
+                                        <Text style={{ marginBottom: 12, color: '#ec0b43' }} variant="titleLarge">  {studentData.Prediction}</Text>
+                                    </View>
+                                </>
+                            )}
+                       
 
                     </View>
 
@@ -61,7 +110,7 @@ const StuResults = () => {
 
                 <View style={styles.box4}>
                     <View style={styles.Bgroup} >
-                        <Button textColor='#ffff' mode='contained' onPress={() => { navigation.navigate('TFeeddback') }}>Send message </Button>
+                        <Button textColor='#ffff' mode='contained' onPress={() => { navigation.navigate('TFeeddback', { markId }) }}>Send message </Button>
                         <Button textColor='#ffff' mode='contained' onPress={() => { navigation.navigate('TNavBar') }}>End Process </Button>
                     </View>
 

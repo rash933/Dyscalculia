@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { Avatar, Button, Divider, IconButton } from 'react-native-paper';
@@ -6,12 +6,53 @@ import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
 import AppBa3 from '../components/appBa3';
 import { useNavigation } from '@react-navigation/core';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import axios from 'axios';
 
 const Notifi = () => {
     const navigation = useNavigation();
-    // const [searchQuery, setSearchQuery] = React.useState('');
+    const [responseData, setResponseData] = useState([]);
+    const [studentID, setStudentID] = useState('');
+    const [counter, setCounter] = useState(1);
 
-    // const onChangeSearch = query => setSearchQuery(query);
+    // Fetch data from API using the CurrentstudentID from AsyncStorage
+    useEffect(() => {
+        const fetchStudentIDFromCache = async () => {
+            try {
+                const studentIDFromCache = await AsyncStorage.getItem('CurrentstudentID');
+                if (studentIDFromCache) {
+                    setStudentID(studentIDFromCache);
+                    fetchData(studentIDFromCache);
+                    console.log(studentIDFromCache);
+                }
+            } catch (error) {
+                console.error('Error fetching student ID from cache:', error);
+            }
+        };
+
+        fetchStudentIDFromCache();
+    }, []);
+
+    const fetchData = async (studentID) => {
+        const apiUrl = 'http://192.168.1.2:8000/api/markby';
+        const requestData = {
+            StudentID: studentID,
+        };
+
+        try {
+            const response = await axios.post(apiUrl, requestData);
+            setResponseData(response.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    // Function to navigate to another screen with the _id as parameter
+    const navigateToNextScreen = (_id) => {
+  
+        navigation.navigate('NotifiView', { _id });
+    };
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
@@ -20,108 +61,27 @@ const Notifi = () => {
 
                 <View style={styles.box3}>
                     <ScrollView>
-                        <Card mode='outlined' style={styles.card}>
-                            <Card.Title
-                                title="Card Title"
-
-
-                            />
-                            <Divider />
-                            <Card.Content>
-
-                                <Text variant="bodyMedium">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do</Text>
-                            </Card.Content>
-
-                            <Card.Actions>
-
-                                <Button textColor='#ffff' onPress={() => { navigation.navigate('NotifiView') }} mode='contained'>View More</Button>
-                            </Card.Actions>
-                        </Card>
-                        <Card mode='outlined' style={styles.card}>
-                            <Card.Title
-                                title="Card Title"
-
-
-                            />
-                            <Divider />
-                            <Card.Content>
-
-                                <Text variant="bodyMedium">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do</Text>
-                            </Card.Content>
-
-                            <Card.Actions>
-
-                                <Button textColor='#ffff' mode='contained'>View More</Button>
-                            </Card.Actions>
-                        </Card>
-                        <Card mode='outlined' style={styles.card}>
-                            <Card.Title
-                                title="Card Title"
-
-
-                            />
-                            <Divider />
-                            <Card.Content>
-
-                                <Text variant="bodyMedium">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do</Text>
-                            </Card.Content>
-
-                            <Card.Actions>
-
-                                <Button textColor='#ffff' mode='contained'>View More</Button>
-                            </Card.Actions>
-                        </Card>
-                        <Card mode='outlined' style={styles.card}>
-                            <Card.Title
-                                title="Card Title"
-
-
-                            />
-                            <Divider />
-                            <Card.Content>
-
-                                <Text variant="bodyMedium">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do</Text>
-                            </Card.Content>
-
-                            <Card.Actions>
-
-                                <Button textColor='#ffff' mode='contained'>View More</Button>
-                            </Card.Actions>
-                        </Card>
-                        <Card mode='outlined' style={styles.card}>
-                            <Card.Title
-                                title="Card Title"
-
-
-                            />
-                            <Divider />
-                            <Card.Content>
-
-                                <Text variant="bodyMedium">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do</Text>
-                            </Card.Content>
-
-                            <Card.Actions>
-
-                                <Button textColor='#ffff' mode='contained'>View More</Button>
-                            </Card.Actions>
-                        </Card>
-                        <Card mode='outlined' style={styles.card}>
-                            <Card.Title
-                                title="Card Title"
-
-
-                            />
-                            <Divider />
-                            <Card.Content>
-
-                                <Text variant="bodyMedium">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do</Text>
-                            </Card.Content>
-
-                            <Card.Actions>
-
-                                <Button textColor='#ffff' mode='contained'>View More</Button>
-                            </Card.Actions>
-                        </Card>
+                        {responseData.map((item,index) => (
+                            <Card key={item._id} mode='outlined' style={styles.card}>
+                                <Card.Title title={`Notification ${index + 1}`} />
+                                <Divider />
+                                <Card.Content>
+                                    <Text variant="bodyMedium">
+                                        Attandence: {item.AttandenceM}, Prediction: {item.Prediction}
+                                    </Text>
+                                </Card.Content>
+                                <Card.Actions>
+                                    <Button
+                                        textColor='#ffff'
+                                        onPress={() => navigateToNextScreen(item._id)}
+                                        mode='contained'
+                                    >
+                                        View
+                                    </Button>
+                                </Card.Actions>
+                            </Card>
+                        ))}
+                       
 
                     </ScrollView>
                 </View>
