@@ -3,13 +3,13 @@ import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { Avatar, Button, Divider, IconButton, TextInput } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/core';
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const StudentList = () => {
-    const navigation = useNavigation();
+const StudentList = ({ navigation }) => {
+    
     const [students, setStudents] = useState([]); // This will hold the list of students
     const [searchQuery, setSearchQuery] = useState(''); // This will hold the search query
     const [selectedStudentId, setSelectedStudentId] = useState(null); // State to hold the selected student ID
@@ -22,9 +22,9 @@ const StudentList = () => {
                 const currentTeacherID = await AsyncStorage.getItem('CurrentTeacherID');
 
                 if (currentTeacherID) {
-                    const response = await axios.post('http://192.168.1.2:8000/api/studentby', {
+                    const response = await axios.post('http://192.168.1.3:8000/api/studentby', {
                         TeacherID: currentTeacherID,
-                        LevelStatus: 'high',
+                        LevelStatus: 'High',
                     });
 
                     setStudents(response.data);

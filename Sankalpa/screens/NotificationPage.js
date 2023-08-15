@@ -35,7 +35,7 @@ const Notifi = () => {
     }, []);
 
     const fetchData = async (studentID) => {
-        const apiUrl = 'http://192.168.1.2:8000/api/markby';
+        const apiUrl = 'http://192.168.1.3:8000/api/markby';
         const requestData = {
             StudentID: studentID,
         };

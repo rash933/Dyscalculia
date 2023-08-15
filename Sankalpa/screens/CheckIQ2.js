@@ -12,13 +12,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const CheckIQ2 = ({ navigation, route }) => {
     const { IQCheck4 } = route.params;
     const { test2 } = route.params;
-   
+
+
     // Function to handle the press events
-    
+
     const handlePress = async (selectedOption) => {
         let IQpzl3 = 'false';
 
-        if (selectedOption === 2) {
+        if (selectedOption === 1) {
             IQpzl3 = 'true';
         }
         const test3 = { ...test2, IQpzl3 };
@@ -39,10 +40,22 @@ const CheckIQ2 = ({ navigation, route }) => {
 
             return percentage;
         }
-        const iq = calculatePercentage(test3);
+
+        const iq = parseFloat(calculatePercentage(test3).toFixed(1));
+
         console.log(iq);
         const IQCheck5 = { iq };
         console.log(IQCheck5);
+
+
+        AsyncStorage.setItem('iq_test', JSON.stringify(iq)).then(() => {
+
+            console.log("iq_test saved successfully!");
+            console.log(JSON.stringify(iq));
+        }).catch((error) => {
+            console.error('Error saving iq_test to AsyncStorage:', error);
+        });
+
 
         try {
             // Get the cached current student ID from AsyncStorage
@@ -51,8 +64,8 @@ const CheckIQ2 = ({ navigation, route }) => {
             // Check if the currentStudentID is available in AsyncStorage
             if (StudentID) {
                 // Use the currentStudentID in the API URL for updating student IQ
-                const updateApiUrl = `http://192.168.1.2:8000/api/student/update/${StudentID}`;
-                const response = await axios.put(updateApiUrl, IQCheck4);
+                const updateApiUrl = `http://192.168.1.3:8000/api/student/update/${StudentID}`;
+                const response = await axios.put(updateApiUrl, IQCheck5);
                 console.log('Success updated student IQ:', response.data);
                 navigation.navigate('BehaviorCheck1');
             } else {
@@ -61,9 +74,10 @@ const CheckIQ2 = ({ navigation, route }) => {
         } catch (error) {
             console.error('Error posting data:', error);
         }
+
+
+
     };
-
-
 
    
 

@@ -4,27 +4,58 @@ import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { List, Avatar } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
 import axios from 'axios';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { SegmentedButtons } from 'react-native-paper';
 const ResultList = () => {
-    const TID = '64ca1a7b3362ce71d6fdc5f1';
+    
     const [value, setValue] = useState('');
     const [students, setStudents] = useState([]);
-
+    const [uniqueStudentIds, setUniqueStudentIds] = useState(new Set());
     useEffect(() => {
-        fetchStudents();
-    }, []);
+        async function fetchData() {
+            try {
+                const storedTID = await AsyncStorage.getItem('CurrentTeacherID');
+                if (storedTID) {
+                   
+                    fetchStudents(storedTID);
+                } else {
+                    console.error('No teacher ID found in AsyncStorage.');
+                    setIsLoading(false);
+                }
+            } catch (error) {
+                console.error('Error fetching teacher ID from AsyncStorage:', error);
+                setIsLoading(false);
+            }
+        }
 
-    const fetchStudents = async () => {
+        fetchData();
+    }, []);
+   
+
+    const fetchStudents = async (storedTID) => {
         try {
             // Fetch students' marks data using TeacherId
-            const response = await axios.post('http://192.168.1.2:8000/api/markby', { TeacherId: TID });
+            const response = await axios.post('http://192.168.1.3:8000/api/markby', { TeacherId: storedTID });
             const studentsData = response.data;
 
-            // Fetch student details for each student using StudentID
-            const studentDetailsPromises = studentsData.map(async (student) => {
-                const studentResponse = await axios.post('http://192.168.1.2:8000/api/studentby', {
+            // Create a map to store the latest student data for each StudentID
+            const latestStudentDataMap = new Map();
+
+            // Iterate through students' marks data
+            studentsData.forEach((student) => {
+                // Use StudentID as the key
+                const studentID = student.StudentID;
+
+                // If the map doesn't have data for the current StudentID or the new data is more recent, update the map entry
+                if (!latestStudentDataMap.has(studentID) || student._id > latestStudentDataMap.get(studentID)._id) {
+                    latestStudentDataMap.set(studentID, student);
+                }
+            });
+
+            // Fetch student details for each student using StudentID from the latest student data map
+            const studentDetailsPromises = Array.from(latestStudentDataMap.values()).map(async (student) => {
+                const studentResponse = await axios.post('http://192.168.1.3:8000/api/studentby', {
                     _id: student.StudentID,
                 });
                 return studentResponse.data[0];
@@ -32,8 +63,8 @@ const ResultList = () => {
 
             const studentsWithDetails = await Promise.all(studentDetailsPromises);
 
-            // Merge student marks data with student details
-            const studentsWithMarksAndDetails = studentsData.map((student, index) => ({
+            // Merge the latest student marks data with student details
+            const studentsWithMarksAndDetails = Array.from(latestStudentDataMap.values()).map((student, index) => ({
                 ...student,
                 ...studentsWithDetails[index],
             }));
@@ -50,6 +81,7 @@ const ResultList = () => {
         }
     };
 
+
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
@@ -64,7 +96,7 @@ const ResultList = () => {
                             buttons={[
                                 {
                                     icon: '',
-                                    value: 'low level',
+                                    value: 'Low Level',
                                     label: 'Low Level',
                                     labelStyle: {
                                         width: 100,
@@ -72,7 +104,7 @@ const ResultList = () => {
                                 },
                                 {
                                     icon: '',
-                                    value: 'low medium',
+                                    value: 'Low Medium',
                                     label: 'Low Medium',
                                     labelStyle: {
                                         width: 100,
@@ -80,7 +112,7 @@ const ResultList = () => {
                                 },
                                 {
                                     icon: '',
-                                    value: 'high medium',
+                                    value: 'High Medium',
                                     label: 'High Medium',
                                     labelStyle: {
                                         width: 100,
@@ -88,7 +120,7 @@ const ResultList = () => {
                                 },
                                 {
                                     icon: '',
-                                    value: 'high level',
+                                    value: 'High Level',
                                     label: 'High Level',
                                     labelStyle: {
                                         width: 100,

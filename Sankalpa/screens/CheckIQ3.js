@@ -15,7 +15,7 @@ const CheckIQ3 = ({ navigation, route }) => {
     const handlePress = (selectedOption) => {
         let IQpzl2 = 'false';
 
-        if (selectedOption === 2) {
+        if (selectedOption === 1) {
             IQpzl2 = 'true';
         }
         const test2 = { ...test1, IQpzl2 };

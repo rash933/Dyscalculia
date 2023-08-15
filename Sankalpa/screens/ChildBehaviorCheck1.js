@@ -15,9 +15,9 @@ const BehaviorCheck1 = () => {
 
     const calculateScore = () => {
         let score1 = 0;
-        if (checked1) score1 += 10;
-        if (checked2) score1 += 10;
-        if (checked3) score1 += 10;
+        if (checked1) score1 += 15;
+        if (checked2) score1 += 15;
+        if (checked3) score1 += 15;
         // You can adjust the scoring logic based on your requirements
         return score1;
     };

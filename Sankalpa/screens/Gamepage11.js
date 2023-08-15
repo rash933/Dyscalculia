@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground ,BackHandler } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, BackHandler } from 'react-native';
 import { Avatar, Divider, IconButton, Card, Text, Button } from 'react-native-paper';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import THomeScreen from './THome';
@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const GamePage11 = ({ navigation, route }) => {
+
     const { G9 } = route.params;
     const handlePress = async (selectedOption) => {
         let g10Value = 'false';
@@ -30,25 +31,99 @@ const GamePage11 = ({ navigation, route }) => {
         const Quiz = { quiz: Number(percentageOfTrueValues) };
         console.log(Quiz);
 
+
+        AsyncStorage.setItem('questionaire_child', JSON.stringify(percentageOfTrueValues)).then(() => {
+
+            console.log("questionaire_child saved successfully!");
+            console.log(JSON.stringify(percentageOfTrueValues));
+        }).catch((error) => {
+            console.error('Error saving questionaire_child to AsyncStorage:', error);
+        });
+
+
+
         try {
+            const questionaireChild = await AsyncStorage.getItem('questionaire_child');
+            const questionaireParent = await AsyncStorage.getItem('questionaire_parent');
+            const iqTest = await AsyncStorage.getItem('iq_test');
+
             // Get the cached current student ID from AsyncStorage
             const currentStudentID = await AsyncStorage.getItem('CurrentstudentID');
 
             // Check if the currentStudentID is available in AsyncStorage
             if (currentStudentID) {
                 // Use the currentStudentID in the API URL for updating Quiz
-                const updateApiUrl = `http://192.168.1.2:8000/api/student/update/${currentStudentID}`;
-                const response = await axios.put(updateApiUrl, Quiz);
-                console.log('Success updated Quiz to student:', response.data);
-                navigation.navigate('QuizResult');
+                const updateApiUrl = `http://192.168.1.3:8000/api/student/update/${currentStudentID}`;
+                const updateResponse = await axios.put(updateApiUrl, Quiz);
+                console.log('Success updated Quiz to student:', updateResponse.data);
+
+
+                try {
+                    const formData = new FormData();
+                    formData.append('questionaire_child', questionaireChild);
+                    formData.append('questionaire_parent', questionaireParent);
+                    formData.append('iq_test', iqTest);
+
+                    const probabilityApiUrl = 'http://192.168.1.3:5000/probability';
+                    const probabilityResponse = await axios.post(probabilityApiUrl, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    }
+                    );
+
+
+
+                    console.log('Success posting data to probability:', probabilityResponse.data);
+                    // Extract the prediction result from the probability response
+                    const predictionResult = probabilityResponse.data.data;
+
+                    // Extract the first word from the prediction result
+                    const words = predictionResult.split(' ');
+                    const firstWord = words.length > 0 ? words[0] : '';
+
+                    // Define the update data object
+                    const updateData = {
+                        levelstatus: firstWord
+                    };
+                    console.log(updateData);
+                    // Construct the API update URL
+                    const updateApiUrl = `http://192.168.1.3:8000/api/student/update/${currentStudentID}`;
+
+                    // Make a PUT request to update the student's prediction result
+                    axios.put(updateApiUrl, updateData)
+                        .then(updateResponse => {
+                            console.log('Success updating prediction result:', updateResponse.data);
+                            navigation.navigate('QuizResult');
+                            // Handle the response or navigation as needed
+                        })
+                        .catch(error => {
+                            console.error('Error updating prediction result:', error);
+                        });
+
+
+
+
+
+
+                }
+                catch (error) {
+                    console.error('Error posting data to probability:', error);
+                }
+
+
             } else {
                 console.log('Current student ID not found in AsyncStorage.');
             }
         } catch (error) {
             console.error('Error posting data:', error);
         }
+
         // Navigate to the next screen (Profile2) with the parameters
-       
+
+
+
+
     };
 
 
@@ -67,7 +142,7 @@ const GamePage11 = ({ navigation, route }) => {
             // Remove the back button event listener when the component unmounts
             backHandler.remove();
         };
-    }, []); 
+    }, []);
 
     return (
         <ImageBackground blurRadius={2}

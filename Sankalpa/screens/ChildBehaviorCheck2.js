@@ -16,9 +16,9 @@ const BehaviorCheck2 = ({ navigation, route }) => {
 
     const calculateScore = () => {
         let score2 = 0;
-        if (checked1) score2 += 10;
-        if (checked2) score2 += 10;
-        if (checked3) score2 += 10;
+        if (checked1) score2 += 15;
+        if (checked2) score2 += 15;
+        if (checked3) score2 += 15;
         // You can adjust the scoring logic based on your requirements
         return score2;
     };

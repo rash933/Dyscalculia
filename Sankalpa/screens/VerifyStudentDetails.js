@@ -14,7 +14,7 @@ const VerifyStudent = ({ navigation, route }) => {
     useEffect(() => {
         const fetchStudentData = async () => {
             try {
-                const response = await axios.post('http://192.168.1.2:8000/api/studentby', {
+                const response = await axios.post('http://192.168.1.3:8000/api/studentby', {
                     _id: studentId,
                 });
                 setStudentData(response.data[0]); // Assuming the API returns an array with a single student object

@@ -14,6 +14,8 @@ const QuizResult = ({ navigation }) => {
 
     const [iq, setIq] = useState(null);
     const [quiz, setQuiz] = useState(null);
+    const [dob, setDob] = useState(null);
+    const [name, setName] = useState(null);
     const [levelStatus, setLevelStatus] = useState(null);
     const [parentQ, setParentQ] = useState(null);
 
@@ -46,7 +48,7 @@ const QuizResult = ({ navigation }) => {
     const fetchData = async () => {
         try {
 
-            const apiUrl = 'http://192.168.1.2:8000/api/studentby';
+            const apiUrl = 'http://192.168.1.3:8000/api/studentby';
             // Get the cached current student ID from AsyncStorage
             const currentStudentID = await AsyncStorage.getItem('CurrentstudentID');
 
@@ -73,10 +75,7 @@ const QuizResult = ({ navigation }) => {
                 setQuiz(quiz);
                 setLevelStatus(levelStatus);
                 setParentQ(parentQ);
-                setDob(dob);
-                setName(name);
-                const age = calculateAge(dob);
-                setAge(age);
+             
             } else {
                 console.log('Current student ID not found in AsyncStorage.');
             }

@@ -5,11 +5,12 @@ import { Button } from 'react-native-paper';
 import PredictResultsBox from '../components/predictResultsBox';
 import StudentChart from '../components/donutChart';
 import { useNavigation } from '@react-navigation/core';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const THomeScreen = () => {
     const navigation = useNavigation();
-    const TID = '64ca1a7b3362ce71d6fdc5f1';
+  
     const [teacherData, setTeacherData] = useState(null);
     const [studentCount, setStudentCount] = useState(0);
     const [highLevelStudentCount, setHighLevelStudentCount] = useState(0);
@@ -19,48 +20,80 @@ const THomeScreen = () => {
     const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
         // Fetch all students with TeacherID: "0"
-        axios
-            .post("http://192.168.1.2:8000/api/markby", {
-                TeacherId: TID,
-            })
-            .then((response) => {
-                const students = response.data;
-
-                // Calculate counts based on prediction levels
-                const highLevelStudents = students.filter(
-                    (student) => student.Prediction === "high level"
-                );
-                const highMediumLevelStudents = students.filter(
-                    (student) => student.Prediction === "high medium"
-                );
-                const lowLevelStudents = students.filter(
-                    (student) => student.Prediction === "low level"
-                );
-                const lowMediumLevelStudents = students.filter(
-                    (student) => student.Prediction === "low medium"
-                );
-
-                setStudentCount(students.length);
-                setHighLevelStudentCount(highLevelStudents.length);
-                setHighMediumLevelStudentCount(highMediumLevelStudents.length);
-                setLowLevelStudentCount(lowLevelStudents.length);
-                setLowMediumLevelStudentCount(lowMediumLevelStudents.length);
-
-                // Fetching completed, set isLoading to false
+        async function fetchData() {
+            try {
+                const storedTID = await AsyncStorage.getItem('CurrentTeacherID');
+                if (storedTID) {
+                    fetchStudentData(storedTID);
+                    fetchTeacherData(storedTID);
+                } else {
+                    console.error('No teacher ID found in AsyncStorage.');
+                    setIsLoading(false);
+                }
+            } catch (error) {
+                console.error('Error fetching teacher ID from AsyncStorage:', error);
                 setIsLoading(false);
-            })
-            .catch((error) => {
-                console.error("Error fetching student data:", error);
-                setIsLoading(false); // Set isLoading to false even in case of an error
-            });
+            }
+        }
 
-        fetchTeacherData();
+        fetchData();
+       
+  
     }, []);
 
-    const fetchTeacherData = async () => {
+
+
+    const fetchStudentData = async (teacherID) => {
         try {
-            const response = await axios.post('http://192.168.1.2:8000/api/teachersby', {
-                _id: TID,
+            const response = await axios.post("http://192.168.1.3:8000/api/markby", {
+                TeacherId: teacherID,
+            });
+
+            const students = response.data;
+
+            // Create a set to store unique student IDs
+            const uniqueStudentIds = new Set();
+
+            // Iterate through students to collect unique student IDs
+            students.forEach((student) => {
+                uniqueStudentIds.add(student.StudentId);
+            });
+
+            const uniqueStudentCount = uniqueStudentIds.size;
+
+            // Create a map to store counts for each prediction level
+            const predictionLevelCounts = {
+                "High Level": 0,
+                "High Medium": 0,
+                "Low Level": 0,
+                "Low Medium": 0,
+            };
+
+            // Iterate through students to count based on prediction levels
+            students.forEach((student) => {
+                if (predictionLevelCounts[student.Prediction] === 0) {
+                    predictionLevelCounts[student.Prediction] += 1; // Count only once for each prediction level
+                }
+            });
+
+            setStudentCount(uniqueStudentCount); // Set the count of unique student IDs
+            setHighLevelStudentCount(predictionLevelCounts["High Level"]);
+            setHighMediumLevelStudentCount(predictionLevelCounts["High Medium"]);
+            setLowLevelStudentCount(predictionLevelCounts["Low Level"]);
+            setLowMediumLevelStudentCount(predictionLevelCounts["Low Medium"]);
+
+            setIsLoading(false);
+        } catch (error) {
+            console.error("Error fetching student data:", error);
+            setIsLoading(false);
+        }
+    };
+
+
+    const fetchTeacherData = async (teacherID) => {
+        try {
+            const response = await axios.post('http://192.168.1.3:8000/api/teachersby', {
+                _id: teacherID,
             });
             const teacher = response.data[0];
             setTeacherData(teacher);

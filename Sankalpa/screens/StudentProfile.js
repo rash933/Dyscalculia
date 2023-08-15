@@ -34,7 +34,7 @@ const StuProfile = () => {
     };
 
     const fetchData = async () => {
-        const apiUrl = 'http://192.168.1.2:8000/api/studentby';
+        const apiUrl = 'http://192.168.1.3:8000/api/studentby';
 
         try {
             // Get the student ID from AsyncStorage

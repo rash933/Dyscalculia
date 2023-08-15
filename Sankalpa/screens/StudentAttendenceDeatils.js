@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const StudentAttendence = ({ navigation, route }) => {
-    const [value, setValue] = useState('good');
+    const [value, setValue] = useState('0');
     const { Mlist3 } = route.params;
 
     const handleContinue = async () => {
@@ -19,39 +19,67 @@ const StudentAttendence = ({ navigation, route }) => {
         try {
             console.log(Mlist4);
 
-            // Get teacherid from AsyncStorage
-            const teacherid = await AsyncStorage.getItem('CurrentTeacherID');
+            try {
+                const formData = new FormData();
+                formData.append('stage_id', '1');
+                formData.append('class_performance', Mlist4.performancem);
+                formData.append('class_test_marks', Mlist4.testm);
+                formData.append('assignment_marks', Mlist4.assignmentm);
+                formData.append('student_class_attendance', Mlist4.attandencem);
 
-            // Check if teacherid is not null
-            if (teacherid !== null) {
-                // Add teacherid to the data to be posted
-                const postData = {
-                    performancem: Mlist4.performancem,
-                    testm: Mlist4.testm,
-                    assignmentm: Mlist4.assignmentm,
-                    attandencem: Mlist4.attandencem,
-                    prediction: 'low medium',
-                    studentid: Mlist4.studentid,
-                    feedback: '0',
-                    teacherid: teacherid,
-                };
-
-                console.log(postData);
-                // Make the POST request using Axios
-                const response = await axios.post('http://192.168.1.2:8000/api/mark/add', postData);
-                console.log('Response:', response.data); // <-- Print the response in the console
-                const markId = response.data.id;
-                console.log(markId);
-                // Check the response status and handle accordingly
-                if (response.status === 200) {
-                    console.log('Data posted successfully!');
-                    navigation.navigate('ConfirmStuDE', { markId });
-                } else {
-                    console.error('Failed to post data.');
+                const progressApiUrl = 'http://192.168.1.3:5000/progress';
+                const progressResponse = await axios.post(progressApiUrl, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
                 }
-            } else {
-                console.error('CurrentTeacherID not found in cache.');
+                );
+
+                console.log('Success posting data to probabiprogresslity:', progressResponse.data);
+                // Extract the prediction result from the progress response
+                const prediction = progressResponse.data.data;
+
+                console.log(prediction);
+                // Get teacherid from AsyncStorage
+                const teacherid = await AsyncStorage.getItem('CurrentTeacherID');
+
+
+                // Check if teacherid is not null
+                if (teacherid !== null) {
+                    // Add teacherid to the data to be posted
+                    const postData = {
+                        performancem: Mlist4.performancem,
+                        testm: Mlist4.testm,
+                        assignmentm: Mlist4.assignmentm,
+                        attandencem: Mlist4.attandencem,
+                        prediction: prediction,
+                        studentid: Mlist4.studentid,
+                        feedback: '0',
+                        teacherid: teacherid,
+                    };
+
+                    console.log(postData);
+                    // Make the POST request using Axios
+                    const response = await axios.post('http://192.168.1.3:8000/api/mark/add', postData);
+                    console.log('Response:', response.data); // <-- Print the response in the console
+                    const markId = response.data.id;
+                    console.log(markId);
+                    // Check the response status and handle accordingly
+                    if (response.status === 200) {
+                        console.log('MARKS posted successfully!');
+                        navigation.navigate('ConfirmStuDE', { markId });
+                    } else {
+                        console.error('Failed to post data.');
+                    }
+                } else {
+                    console.error('CurrentTeacherID not found in cache.');
+                }
             }
+            catch (error) {
+                console.error('Error posting data to progress:', error);
+            }
+
+          
         } catch (error) {
             console.error('Error:', error);
         }
@@ -73,10 +101,10 @@ const StudentAttendence = ({ navigation, route }) => {
                     <View style={styles.input}>
                         <RadioButton.Group onValueChange={value => setValue(value)} value={value}>
                             <Card mode="outlined" style={{ width: 250, margin: 18 }}>
-                                <RadioButton.Item label="  Good" labelStyle={styles.titleMedium} value="good" />
+                                <RadioButton.Item label="  Good" labelStyle={styles.titleMedium} value="100" />
                             </Card>
                             <Card mode="outlined" style={{ width: 250, margin: 18 }}>
-                                <RadioButton.Item label="  Poor" labelStyle={styles.titleMedium} value="poor" />
+                                <RadioButton.Item label="  Poor" labelStyle={styles.titleMedium} value="0" />
                             </Card>
                         </RadioButton.Group>
                     </View>

@@ -20,7 +20,7 @@ import { BackHandler } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
-const TNavBar = ( ) =>  {
+const TNavBar = ({ navigation } ) =>  {
     const theme = useTheme();
     const [visible, setVisible] = React.useState(false);
 
@@ -32,6 +32,7 @@ const TNavBar = ( ) =>  {
         setVisible(false);
     };
     const handleLogout = () => {
+        navigation.navigate('FirstPage');
         // Perform any logout actions or API calls here if needed
         BackHandler.exitApp();
         setVisible(false);
