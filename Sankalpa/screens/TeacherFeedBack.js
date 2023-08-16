@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Image, } from 'react-native';
+import { StyleSheet, View, Image, Keyboard } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton, TextInput, RadioButton } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
 import axios from 'axios';
@@ -11,9 +11,21 @@ const TFeeddback = ({ navigation, route }) => {
     const [studentName, setStudentName] = useState('');
     const [stageId, setStageId] = useState('');
     const [feedback, setFeedback] = useState('');
+    const [isKeyboardVisible, setKeyboardVisible] = useState(false);
     useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardVisible(true);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardVisible(false);
+        });
+
         fetchStudentDetails(markId);
-    }, []);
+        return () => {
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, [markId]);
 
     const fetchStudentDetails = async (markId) => {
         try {
@@ -71,11 +83,11 @@ const TFeeddback = ({ navigation, route }) => {
                     <Text style={{ textAlign: 'center' }} variant="headlineLarge">Student Details</Text>
                     <View style={styles.input} >
 
-                        <Text style={{ marginBottom: 1 }} variant="headlineSmall">Student Name : {studentName}</Text>
+                        <Text style={{ marginBottom: 1 }} variant="titleLarge">Student Name : {studentName}</Text>
                         <Text style={{ marginBottom: 25 }} variant="titleMedium"> Stage : {stageId ? 'Middle School' : 'Primary School'} {stageId} </Text>
 
                      
-                        {studentData && (
+                        {studentData && !isKeyboardVisible && (
                             <>
                                 <View style={styles.group}>
                                     <Text style={{ marginBottom: 12 }} variant="titleMedium">
@@ -110,8 +122,8 @@ const TFeeddback = ({ navigation, route }) => {
                                     </Text>
                                 </View>
                                 <View style={styles.group} >
-                                    <Text style={{ marginBottom: 12, fontWeight: 'bold' }} variant="titleLarge">Skill Level Result  :</Text>
-                                    <Text style={{ marginBottom: 12, color: '#ec0b43' }} variant="titleLarge">  {studentData.Prediction}</Text>
+                                    <Text style={{ marginBottom: 10, fontWeight: 'bold' }} variant="titleLarge">Skill Level Result  :</Text>
+                                    <Text style={{ marginBottom: 10, color: '#ec0b43' }} variant="titleLarge">  {studentData.Prediction}</Text>
                                 </View>
                             </>
                         )}
@@ -191,8 +203,8 @@ const styles = StyleSheet.create({
     },
 
     box4: {
-        marginLeft: 15,
-        marginRight: 15,
+        marginLeft: 5,
+        marginRight: 5,
         marginTop: 10,
         justifyContent: 'center',
         alignContent: 'center',

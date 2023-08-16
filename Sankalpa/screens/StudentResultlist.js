@@ -88,10 +88,10 @@ const ResultList = () => {
             <AppBa2 title={'Student Results List '} />
             <View style={styles.box1}>
                 <View style={styles.box2}>
+                    <ScrollView horizontal
+                        showsHorizontalScrollIndicator={false}>
+                        <SegmentedButtons 
                  
-                        <SegmentedButtons
-                        
-                            style={styles.segmentedButtonsContainer}
                             value={value}
                             onValueChange={setValue}
                             buttons={[
@@ -102,7 +102,7 @@ const ResultList = () => {
                                     labelStyle: {
                                         width: 100,
                                     },
-                                 
+                                 c
                                 },
                                 {
                                     icon: '',
@@ -131,8 +131,8 @@ const ResultList = () => {
                                 },
                             ]}
                         />
-
-                        <ScrollView>
+                    </ScrollView>
+                    <ScrollView style={styles.scrollContainer}>
                             {students
                                 .filter((student) => student.Prediction === value)
                                 .map((student) => (
@@ -179,8 +179,8 @@ const styles = StyleSheet.create({
         fontSize: 19,
        
     },
-    segmentedButtonsContainer: {
-     marginTop:23
+    scrollContainer: {
+     marginTop:27
     },
     segmentedButton: {
         paddingVertical: 10,

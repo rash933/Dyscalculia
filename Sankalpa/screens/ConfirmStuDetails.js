@@ -50,7 +50,7 @@ const ConfirmStuDE = ({ navigation, route }) => {
                     </Text>
                     <View style={styles.input}>
                         {/* Render student name and stage ID here */}
-                        <Text style={{ marginBottom: 1 }} variant="headlineSmall">
+                        <Text style={{ marginBottom: 1 }} variant="titleLarge">
                             Student Name: {studentName}
                         </Text>
                         <Text style={{ marginBottom: 25 }} variant="titleMedium">
@@ -153,8 +153,8 @@ const styles = StyleSheet.create({
     },
 
     box4: {
-        marginLeft: 15,
-        marginRight: 15,
+        marginLeft: 5,
+        marginRight: 5,
         marginTop: 10,
         justifyContent: 'center',
         alignContent: 'center',

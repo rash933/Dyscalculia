@@ -8,22 +8,24 @@ const TTermsScreen = () => {
     return (
         <View style={styles.container}>
 
-            <Text style={{ textAlign: 'center' }} variant="displaySmall">Terms and Conditions </Text>
+            <Text style={{ textAlign: 'center', marginTop: 20 }} variant="displaySmall">Terms and Conditions </Text>
                 <ScrollView>
             <View style={styles.box}>
-                    <View style={{ height: 120, marginTop: 20 }}>
+                    <View style={{ height: 150}}>
+                        <View style={styles.textBox}>
                         <Text style={styles.subtitle} variant="displaySmall">01.Data Privacy and Consent:</Text>
                         <Text style={styles.smallText} variant="displaySmall">MathMaster collects and stores quiz results and user performance data to personalize the learning experience and track progress over time.
                             By creating an account and using MathMaster, users consent to the collection, storage, and use of their data as outlined in the app's Privacy Policy.</Text>
+                            </View>
                     </View>
-                    <View style={{ height: 60, marginTop: 20 }}>
+                    <View style={{ height: 150 }}>
                         <View style={styles.textBox}>
                             <Text style={styles.subtitle} variant="displaySmall">02.Disclaimer and Educational Use:</Text>
                             <Text style={styles.smallText} variant="displaySmall">The app does not provide medical advice or diagnose dyscalculia or any other learning disability. It is not a substitute for professional educational or medical evaluations.</Text>
                         </View>
 
                     </View>
-                    <View style={{ height: 80, marginTop: 20 }}>
+                    <View style={{ height: 150, }}>
                         <View style={styles.textBox}>
                             <Text style={styles.subtitle} variant="displaySmall">
                                 03.Future Updates and Pro Version:</Text>
@@ -62,14 +64,14 @@ const styles = StyleSheet.create({
         lineHeight: 22
     },
     textBox: {
-        height: 110,
-        marginTop: 20
+        // backgroundColor: '#000',
+        marginTop: 15
     },
     box: {
-        height:700,
+        height:600,
         marginBottom: 28,
-        marginRight: 23,
-        marginLeft: 23,
+        marginRight: 25,
+        marginLeft: 25,
         display: 'flex',
         flexdirection: 'column',
         alignitems: 'stretch',

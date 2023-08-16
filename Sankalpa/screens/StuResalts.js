@@ -47,7 +47,7 @@ const StuResults = ({ navigation, route }) => {
                             Skill Level predication Report</Text>
                     <View style={styles.input} >
                             {/* Render student name and stage ID here */}
-                            <Text style={{ marginBottom: 1 }} variant="headlineSmall">
+                            <Text style={{ marginBottom: 1 }} variant="titleLarge">
                                 Student Name: {studentName}
                             </Text>
                             <Text style={{ marginBottom: 25 }} variant="titleMedium">
@@ -90,8 +90,8 @@ const StuResults = ({ navigation, route }) => {
                                         </Text>
                                     </View>
                                     <View style={styles.group} >
-                                        <Text style={{ marginBottom: 12, fontWeight: 'bold' }} variant="titleLarge">Skill Level Result  :</Text>
-                                        <Text style={{ marginBottom: 12, color: '#ec0b43' }} variant="titleLarge">  {studentData.Prediction}</Text>
+                                        <Text style={{ marginBottom: 10, fontWeight: 'bold' }} variant="titleLarge">Skill Level Result  :</Text>
+                                        <Text style={{ marginBottom: 10, color: '#ec0b43' }} variant="titleLarge">  {studentData.Prediction}</Text>
                                     </View>
                                 </>
                             )}
@@ -162,8 +162,8 @@ const styles = StyleSheet.create({
     },
 
     box4: {
-        marginLeft: 15,
-        marginRight: 15,
+        marginLeft: 5,
+        marginRight: 5,
         marginTop: 10,
         justifyContent: 'center',
         alignContent: 'center',
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
 
     },
     input: {
-        marginTop: 5,
+        marginTop: 10,
         display: 'flex',
         flexdirection: 'column',
         height: 350,

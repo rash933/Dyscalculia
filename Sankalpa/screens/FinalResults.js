@@ -4,6 +4,7 @@ import { StyleSheet, View, Image, } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton, TextInput, RadioButton } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
 import axios from 'axios';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const FinalResults = ({ navigation, route }) => {
     const { markId } = route.params;
@@ -54,9 +55,9 @@ const FinalResults = ({ navigation, route }) => {
                     <Text style={{ textAlign: 'center' }} variant="headlineLarge">Student Details</Text>
                     <View style={styles.input} >
 
-                        <Text style={{ marginBottom: 1 }} variant="headlineSmall">Student Name : {studentName}</Text>
+                        <Text style={{ marginBottom: 1 }} variant="titleLarge">Student Name : {studentName}</Text>
                         <Text style={{ marginBottom: 25 }} variant="titleMedium"> Stage : {stageId ? 'Middle School' : 'Primary School'} {stageId} </Text>
-
+<ScrollView showsVerticalScrollIndicator={false}>
                         {studentData && (
                             <>
                                 <View style={styles.group}>
@@ -92,27 +93,27 @@ const FinalResults = ({ navigation, route }) => {
                                     </Text>
                                 </View>
                                 <View style={styles.group} >
-                                    <Text style={{ marginBottom: 12, fontWeight: 'bold' }} variant="titleLarge">Skill Level Result  :</Text>
-                                    <Text style={{ marginBottom: 12, color: '#ec0b43' }} variant="titleLarge">  {studentData.Prediction}</Text>
+                                    <Text style={{ marginBottom: 10, fontWeight: 'bold' }} variant="titleLarge">Skill Level Result  :</Text>
+                                    <Text style={{ marginBottom: 10, color: '#ec0b43' }} variant="titleLarge">  {studentData.Prediction}</Text>
                                 </View>
                                 <View style={styles.group} >
                                     <Text style={{ marginBottom: 10 }} variant="titleMedium">Teacher Feedback  :</Text>
 
 
                                 </View>
-                                <View style={{ height: 80, }}>
+                                <View style={{ height: 40, }}>
                                     <Text style={{ marginBottom: 10 }} variant="titleMedium"  >{studentData.FeedBack}</Text>
                                 </View>
                             </>
                         )}
                         
- 
+                        
                         <View style={styles.group} >
                             <Text style={{ marginBottom: 10 }} variant="titleMedium">Date and Time  :</Text>
                             <Text style={{ marginBottom: 10 }} variant="titleMedium">{formattedDate}</Text>
                         </View>
+                </ScrollView>
                     </View>
-
 
                     <View style={styles.note}>
                       
@@ -175,8 +176,8 @@ const styles = StyleSheet.create({
     },
 
     box4: {
-        marginLeft: 15,
-        marginRight: 15,
+        marginLeft: 5,
+        marginRight: 5,
         marginTop: 10,
         justifyContent: 'center',
         alignContent: 'center',
