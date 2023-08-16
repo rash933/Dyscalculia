@@ -1,7 +1,9 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/core';
 import { StyleSheet, View, Text, Image, ScrollView } from "react-native";
 import { Button, FAB, Portal, PaperProvider } from 'react-native-paper';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const StdHomeScreen = () => {
     const navigation = useNavigation();
@@ -10,6 +12,44 @@ const StdHomeScreen = () => {
     const onStateChange = ({ open }) => setState({ open });
 
     const { open } = state;
+   
+    
+    const [name, setName] = useState(null);
+
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        const apiUrl = 'http://192.168.1.2:8000/api/studentby';
+
+        try {
+            // Get the student ID from AsyncStorage
+            const studentID = await AsyncStorage.getItem('CurrentstudentID');
+
+            // Check if studentID is available in AsyncStorage
+            if (studentID) {
+                const requestData = {
+                    _id: studentID,
+                };
+
+                const response = await axios.post(apiUrl, requestData);
+                const studentData = response.data[0];
+                const name = studentData.Name;
+               
+
+                // Set the extracted values to the state
+               
+                setName(name);
+               
+            } else {
+                console.log('Student ID not found in AsyncStorage.');
+            }
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
+    };
     return (
         <PaperProvider>
             <View style={styles.container}>
@@ -24,7 +64,7 @@ const StdHomeScreen = () => {
                                         Check the dyscalculia probability level of{"\n"}students
                                     </Text>
                                     <Button textColor='#ffff' buttonColor='#002060' mode="contained" onPress={() => { navigation.navigate('Onboardk') }}>
-                                        Predict Results
+                                        Take a Test
                                     </Button>
                                 </View>
                                 <View style={styles.right}>

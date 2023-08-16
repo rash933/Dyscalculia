@@ -66,7 +66,7 @@ const Registation3 = ({ navigation, route }) => {
         if (finalUserData.role === 'false') {
 
             try {
-                const response = await axios.post('http://192.168.1.3:8000/api/teacher/register', finalUserData);
+                const response = await axios.post('http://192.168.1.2:8000/api/teacher/register', finalUserData);
                 const TeacherID = response.data.id;
                 console.log('Success add a teacher:', TeacherID);
 
@@ -96,7 +96,7 @@ const Registation3 = ({ navigation, route }) => {
                 };
                 console.log(studentRegi);
                 
-                const response = await axios.post('http://192.168.1.3:8000/api/student/register', studentRegi);
+                const response = await axios.post('http://192.168.1.2:8000/api/student/register', studentRegi);
                 console.log('Success add student:', response.data); 
               
               const  StudentID = response.data.id;

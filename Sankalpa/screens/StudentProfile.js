@@ -16,7 +16,7 @@ const StuProfile = () => {
     const [dob, setDob] = useState(null);
     const [age, setAge] = useState(null);
     const [name, setName] = useState(null);
-
+    const [teachername, setteacherName] = useState(null);
 
     useEffect(() => {
         fetchData();
@@ -34,7 +34,7 @@ const StuProfile = () => {
     };
 
     const fetchData = async () => {
-        const apiUrl = 'http://192.168.1.3:8000/api/studentby';
+        const apiUrl = 'http://192.168.1.2:8000/api/studentby';
 
         try {
             // Get the student ID from AsyncStorage
@@ -56,6 +56,7 @@ const StuProfile = () => {
                 const parentQ = studentData.ParentQ;
                 const name = studentData.Name;
                 const dob = studentData.Dob;
+                const teacherID = studentData.TeacherID;
 
                 // Set the extracted values to the state
                 setIq(iq);
@@ -66,6 +67,17 @@ const StuProfile = () => {
                 setName(name);
                 const age = calculateAge(dob);
                 setAge(age);
+
+                // Fetch teacher data based on teacherID
+                const teacherApiUrl = 'http://192.168.1.2:8000/api/teachersby';
+                const teacherResponse = await axios.post(teacherApiUrl, { _id: teacherID });
+
+                if (teacherResponse.data.length > 0) {
+                    const teacherName = teacherResponse.data[0].Name;
+                    setteacherName(teacherName);
+                } else {
+                    console.log('Teacher not found.');
+                }
             } else {
                 console.log('Student ID not found in AsyncStorage.');
             }
@@ -85,9 +97,13 @@ const StuProfile = () => {
                     <View style={styles.left}>
                         <Text style={styles.Header}>My Profile</Text>
                             <Text style={styles.Name}>Hi, {name}</Text>
-                        <Text style={styles.text}>
-                            Age:{age}{"\n"}Responsible Teacher: Duwasha Abenayaka
-                        </Text>
+                            {teachername && (
+                                <Text style={styles.text}>
+                                    Age: {age}
+                                    {"\n"}
+                                    Responsible Teacher: {teachername}
+                                </Text>
+                            )}
                        
                     </View>
                     <View style={styles.right}>
@@ -142,7 +158,7 @@ const StuProfile = () => {
                         <View style={styles.group}>
                             <View style={styles.box6}>
                                 <Text style={styles.smallText}>
-                                    Math Quiz{"\n"}Math Quiz
+                                    Math Quiz
                                 </Text>
                                     <Text style={styles.smallText23}>{quiz}</Text>
                             </View>

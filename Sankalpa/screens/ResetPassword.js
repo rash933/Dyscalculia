@@ -17,8 +17,8 @@ const ResetPwd = ({ route }) => {
 
     const checkEmailInApi = async () => {
         const endpoints = [
-            'http://192.168.1.3:8000/api/studentby',
-            'http://192.168.1.3:8000/api/teachersby'
+            'http://192.168.1.2:8000/api/studentby',
+            'http://192.168.1.2:8000/api/teachersby'
         ];
 
         for (const endpoint of endpoints) {
@@ -84,8 +84,8 @@ const ResetPwd = ({ route }) => {
         if (userId) {
             try {
                 const endpoint = emailEndpoint.includes('teachersby')
-                    ? 'http://192.168.1.3:8000/api/teacher/update'
-                    : 'http://192.168.1.3:8000/api/student/update';
+                    ? 'http://192.168.1.2:8000/api/teacher/update'
+                    : 'http://192.168.1.2:8000/api/student/update';
 
                 const response = await axios.put(`${endpoint}/${userId}`, { password: newPassword });
                 console.log('Password updated successfully!');

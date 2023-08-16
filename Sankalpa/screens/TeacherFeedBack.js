@@ -18,11 +18,11 @@ const TFeeddback = ({ navigation, route }) => {
     const fetchStudentDetails = async (markId) => {
         try {
             // Fetch student details using markId
-            const markResponse = await axios.post('http://192.168.1.3:8000/api/markby', { _id: markId });
+            const markResponse = await axios.post('http://192.168.1.2:8000/api/markby', { _id: markId });
             const studentId = markResponse.data[0].StudentID;
 
             // Fetch student name and stage ID using studentId
-            const studentResponse = await axios.post('http://192.168.1.3:8000/api/studentby', { _id: studentId });
+            const studentResponse = await axios.post('http://192.168.1.2:8000/api/studentby', { _id: studentId });
             const studentDetails = studentResponse.data[0];
 
             setStudentData(markResponse.data[0]);
@@ -46,7 +46,7 @@ const TFeeddback = ({ navigation, route }) => {
             const updateData = {
                 feedback: feedback,
             };
-            const response = await axios.put(`http://192.168.1.3:8000/api/mark/update/${markId}`, updateData);
+            const response = await axios.put(`http://192.168.1.2:8000/api/mark/update/${markId}`, updateData);
             console.log('Response:', response.data);
 
             // Show success message or navigate to another screen

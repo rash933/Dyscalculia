@@ -36,7 +36,7 @@ const VerifyCode = ({ navigation, route }) => {
         }
 
         try {
-            const API_URL = 'http://192.168.1.3:8000/api/mailsend';
+            const API_URL = 'http://192.168.1.2:8000/api/mailsend';
             const randomNumber = Math.floor(100000 + Math.random() * 900000);
             const requestBody = {
                 email: email,

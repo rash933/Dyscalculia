@@ -21,7 +21,7 @@ const Background2 = () => {
                 </Svg>
                 <View style={styles.logo}>
                     <Text variant="displayMedium" style={styles.logoText1}  >සංකල්ප</Text>
-                    <Text variant="displayMedium" style={styles.logoText2}>Masths Master</Text>
+                    <Text variant="displayMedium" style={styles.logoText2}>MATHS MASTER</Text>
                     {/* <View style={styles.ellipse2Stack}>
                         <Svg viewBox="0 0 150.4 150.06" style={styles.ellipse2}>
                             <Ellipse

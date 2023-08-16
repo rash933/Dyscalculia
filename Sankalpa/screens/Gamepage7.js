@@ -9,6 +9,8 @@ import AppBa3 from '../components/appBa3';
 
 const GamePage7 = ({ navigation, route }) => {
     const { G4 } = route.params;
+    const [buttonPressed, setButtonPressed] = useState(false);
+
     useEffect(() => {
         // Lock the screen orientation to landscape
         ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
@@ -20,11 +22,23 @@ const GamePage7 = ({ navigation, route }) => {
             return true; // Prevent default behavior (going back to the previous screen)
         });
 
+        // Set a timeout to navigate to another screen after 30 seconds
+        const timeout = setTimeout(() => {
+            if (!buttonPressed) {
+                // No button pressed, set g10 to 'false'
+               
+                const G5 = { ...G4, g5: 'false' };
+                console.log(G5);
+                // Navigate to the next screen (Profile2) with the parameters
+                navigation.navigate('GamePage2', { G5 });
+            }
+        }, 30000); // 30 seconds
+
         return () => {
-            // Remove the back button event listener when the component unmounts
+            clearTimeout(timeout);
             backHandler.remove();
         };
-    }, []);
+    }, [buttonPressed]);
     
     const handlePress = (selectedOption) => {
         let g5Value = 'false';
@@ -32,7 +46,7 @@ const GamePage7 = ({ navigation, route }) => {
         if (selectedOption === 1) {
             g5Value = 'true';
         }
-
+        setButtonPressed(true);
         const G5 = { ...G4, g5: g5Value };
         console.log(G5);
         // Navigate to the next screen (Profile2) with the parameters

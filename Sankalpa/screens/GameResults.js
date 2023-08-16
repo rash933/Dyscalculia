@@ -48,7 +48,7 @@ const QuizResult = ({ navigation }) => {
     const fetchData = async () => {
         try {
 
-            const apiUrl = 'http://192.168.1.3:8000/api/studentby';
+            const apiUrl = 'http://192.168.1.2:8000/api/studentby';
             // Get the cached current student ID from AsyncStorage
             const currentStudentID = await AsyncStorage.getItem('CurrentstudentID');
 

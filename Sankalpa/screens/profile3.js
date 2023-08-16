@@ -22,7 +22,7 @@ const Profile3 = ({ navigation, route }) => {
 
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://192.168.1.3:8000/api/teachers');
+            const response = await axios.get('http://192.168.1.2:8000/api/teachers');
             const teachers = response.data;
 
             // Extract names from the response data and set the state
@@ -38,7 +38,7 @@ const Profile3 = ({ navigation, route }) => {
         // get teacher id
         try {
             const sentTeachername = { Name: tname };
-            const response = await axios.post('http://192.168.1.3:8000/api/teachersby', sentTeachername);
+            const response = await axios.post('http://192.168.1.2:8000/api/teachersby', sentTeachername);
 
             // Check if the response contains at least one teacher object
             if (response.data && response.data.length > 0) {
@@ -54,7 +54,7 @@ const Profile3 = ({ navigation, route }) => {
 
                     // Check if studentID is available in AsyncStorage
                     if (studentID) {
-                        const apiUrl = `http://192.168.1.3:8000/api/student/update/${studentID}`;
+                        const apiUrl = `http://192.168.1.2:8000/api/student/update/${studentID}`;
                         const response = await axios.put(apiUrl, TeacherID);
 
                         console.log('Success updated TeacherID to student:', response.data);

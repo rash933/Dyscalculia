@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image, } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton, TextInput, RadioButton } from 'react-native-paper';
@@ -43,27 +43,7 @@ const BehaviorCheck3 = ({ navigation, route }) => {
                 return 10;
         }
     };
-    const getStageStatus = async (id) => {
-        try {
-            // Prepare the request data with the student ID
-            const requestData = {
-                _id: id,
-            };
-
-            // Send the POST request to get student data
-            const response = await axios.post('http://192.168.1.3:8000/api/studentby', requestData);
-
-            // Extract the StageStatus property from the response data
-            const studentData = response.data[0];
-            const stageStatus = studentData.StageStatus;
-
-            // Return the StageStatus
-            return stageStatus;
-        } catch (error) {
-            console.error('Error fetching student data:', error);
-            return null; // or handle the error in an appropriate way
-        }
-    };
+    
 
     const Next = async () => {
         // Calculate the score
@@ -84,40 +64,13 @@ const BehaviorCheck3 = ({ navigation, route }) => {
 
             console.log("questionaire_parent saved successfully!");
             console.log(JSON.stringify(parentq));
+            navigation.navigate('GamePage1', parentq);
         }).catch((error) => {
             console.error('Error saving questionaire_parent to AsyncStorage:', error);
         });
 
 
-        try {
-            // Get the cached current student ID from AsyncStorage
-            const StudentID = await AsyncStorage.getItem('CurrentstudentID');
-
-            // Check if the currentStudentID is available in AsyncStorage
-            if (StudentID) {
-                // Use the currentStudentID in the API URL for updating parentq
-                const updateApiUrl = `http://192.168.1.3:8000/api/student/update/${StudentID}`;
-                const response = await axios.put(updateApiUrl, parentqp);
-                console.log('Success updated parentq to student:', response.data);
-
-                // Get stage status for navigation
-                const stageStatus = await getStageStatus(StudentID);
-
-                if (stageStatus !== null) {
-                    console.log('StageStatus:', stageStatus);
-
-                    if (stageStatus === false) {
-                        navigation.navigate('GamePage4');
-                    } else {
-                        navigation.navigate('GamePage12');
-                    }
-                }
-            } else {
-                console.log('Current student ID not found in AsyncStorage.');
-            }
-        } catch (error) {
-            console.error('Error posting data:', error);
-        }
+      
     };
 
 

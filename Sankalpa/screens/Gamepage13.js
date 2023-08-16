@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground,BackHandler } from 'react-native';
 import { Avatar, Divider, IconButton, Card, Text, Button } from 'react-native-paper';
@@ -9,6 +9,8 @@ import AppBa3 from '../components/appBa3';
 
 const GamePage13 = ({ navigation, route }) => {
     const { G1 } = route.params;
+    const [buttonPressed, setButtonPressed] = useState(false);
+
     useEffect(() => {
         // Lock the screen orientation to landscape
         ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
@@ -20,11 +22,22 @@ const GamePage13 = ({ navigation, route }) => {
             return true; // Prevent default behavior (going back to the previous screen)
         });
 
+        // Set a timeout to navigate to another screen after 30 seconds
+        const timeout = setTimeout(() => {
+            if (!buttonPressed) {
+                // No button pressed, set g10 to 'false'
+                const G2 = { ...G1, g2: 'false' };
+                console.log(G2);
+                // Navigate to the next screen (Profile2) with the parameters
+                navigation.navigate('GamePage21', { G2 });
+            }
+        }, 30000); // 30 seconds
+
         return () => {
-            // Remove the back button event listener when the component unmounts
+            clearTimeout(timeout);
             backHandler.remove();
         };
-    }, []); 
+    }, [buttonPressed]);
 
 
     const handlePress = (selectedOption) => {
@@ -33,7 +46,7 @@ const GamePage13 = ({ navigation, route }) => {
         if (selectedOption === 2) {
             g2Value = 'true';
         }
-
+        setButtonPressed(true);
         const G2 = { ...G1, g2: g2Value };
         console.log(G2);
         // Navigate to the next screen (Profile2) with the parameters

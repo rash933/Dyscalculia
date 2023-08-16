@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
 import { Avatar, Divider, IconButton, Card, Text, Button } from 'react-native-paper';
@@ -7,23 +7,25 @@ import THomeScreen from './THome';
 import AppBa2 from '../components/appBar2';
 import AppBa3 from '../components/appBa3';
 
-const Instruction = () => {
+const Instruction = ({navigation}) => {
     useEffect(() => {
         // Lock the orientation to landscape mode when the component is mounted
         ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
 
-        // Clean up the orientation lock when the component is unmounted
+        // Set a timeout to unlock the orientation and navigate to another screen after 2 seconds
+        const timeout = setTimeout(() => {
+            // Unlock the orientation before leaving the page
+            ScreenOrientation.unlockAsync();
+
+            // Navigate to another screen (replace with your screen name)
+            navigation.navigate('GamePage1');
+        }, 2000); // 2 seconds
+
+        // Clean up the timeout when the component is unmounted
         return () => {
-            ScreenOrientation.lockAsync();
+            clearTimeout(timeout);
         };
     }, []);
-
-    const handleGoBack = () => {
-        // Unlock the orientation before leaving the page
-        ScreenOrientation.lockAsync();
-
-        // You can implement your custom logic to go back or exit the current screen here
-    };
 
     return (
         <View>

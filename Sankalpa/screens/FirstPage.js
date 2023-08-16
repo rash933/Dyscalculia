@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Image } from "react-native";
 import { Avatar, Divider, IconButton, Card, Text, Button, TextInput } from 'react-native-paper';
 import Background1 from '../components/background1';
@@ -119,7 +119,7 @@ resizeMode:'contain',
     },
 
     buttonBox: {
-        height: 90,
+        height: 110,
        
         // backgroundColor: '#000',
         justifyContent: 'space-around',
@@ -139,7 +139,7 @@ resizeMode:'contain',
         justifyContent: 'center',
         alignItems: 'center',
       
-        marginTop: 16
+        marginTop: 24
 
     },
     textButton: {

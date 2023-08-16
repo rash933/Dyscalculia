@@ -36,7 +36,7 @@ const ResultList = () => {
     const fetchStudents = async (storedTID) => {
         try {
             // Fetch students' marks data using TeacherId
-            const response = await axios.post('http://192.168.1.3:8000/api/markby', { TeacherId: storedTID });
+            const response = await axios.post('http://192.168.1.2:8000/api/markby', { TeacherId: storedTID });
             const studentsData = response.data;
 
             // Create a map to store the latest student data for each StudentID
@@ -55,7 +55,7 @@ const ResultList = () => {
 
             // Fetch student details for each student using StudentID from the latest student data map
             const studentDetailsPromises = Array.from(latestStudentDataMap.values()).map(async (student) => {
-                const studentResponse = await axios.post('http://192.168.1.3:8000/api/studentby', {
+                const studentResponse = await axios.post('http://192.168.1.2:8000/api/studentby', {
                     _id: student.StudentID,
                 });
                 return studentResponse.data[0];
@@ -90,17 +90,19 @@ const ResultList = () => {
                 <View style={styles.box2}>
                  
                         <SegmentedButtons
+                        
                             style={styles.segmentedButtonsContainer}
                             value={value}
                             onValueChange={setValue}
                             buttons={[
                                 {
                                     icon: '',
-                                    value: 'Low Level',
+                                    value: 'Low',
                                     label: 'Low Level',
                                     labelStyle: {
                                         width: 100,
                                     },
+                                 
                                 },
                                 {
                                     icon: '',
@@ -109,6 +111,7 @@ const ResultList = () => {
                                     labelStyle: {
                                         width: 100,
                                     },
+                                    
                                 },
                                 {
                                     icon: '',
@@ -120,7 +123,7 @@ const ResultList = () => {
                                 },
                                 {
                                     icon: '',
-                                    value: 'High Level',
+                                    value: 'High',
                                     label: 'High Level',
                                     labelStyle: {
                                         width: 100,

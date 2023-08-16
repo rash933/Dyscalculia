@@ -64,7 +64,7 @@ const CheckIQ6 = ({ navigation, route }) => {
             // Check if the currentStudentID is available in AsyncStorage
             if (StudentID) {
                 // Use the currentStudentID in the API URL for updating student IQ
-                const updateApiUrl = `http://192.168.1.3:8000/api/student/update/${StudentID}`;
+                const updateApiUrl = `http://192.168.1.2:8000/api/student/update/${StudentID}`;
                 const response = await axios.put(updateApiUrl, IQCheck5);
                 console.log('Success updated student IQ:', response.data);
                 navigation.navigate('BehaviorCheck1');

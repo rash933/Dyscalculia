@@ -19,11 +19,11 @@ const NotifiView = ({ navigation, route }) => {
     const fetchStudentDetails = async (_id) => {
         try {
             // Fetch student details using markId
-            const markResponse = await axios.post('http://192.168.1.3:8000/api/markby', { _id: _id });
+            const markResponse = await axios.post('http://192.168.1.2:8000/api/markby', { _id: _id });
             const studentId = markResponse.data[0].StudentID;
 
             // Fetch student name and stage ID using studentId
-            const studentResponse = await axios.post('http://192.168.1.3:8000/api/studentby', { _id: studentId });
+            const studentResponse = await axios.post('http://192.168.1.2:8000/api/studentby', { _id: studentId });
             const studentDetails = studentResponse.data[0];
 
             setStudentData(markResponse.data[0]);
@@ -37,7 +37,7 @@ const NotifiView = ({ navigation, route }) => {
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
-            <AppBa2 title={'Notification 1'} />
+            <AppBa2 title={'Notification'} />
             <View style={styles.box1}>
 
                 <View style={styles.box3}>

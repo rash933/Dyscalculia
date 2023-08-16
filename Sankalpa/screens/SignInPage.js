@@ -42,7 +42,7 @@ const SignIn = ({ navigation, route }) => {
 
         // Make the POST request to the server
         axios
-            .post("http://192.168.1.3:8000/api/teachers/login", {
+            .post("http://192.168.1.2:8000/api/teachers/login", {
 
                 Name: username,
                 Password: password,

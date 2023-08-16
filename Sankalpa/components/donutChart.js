@@ -6,7 +6,7 @@ export default class StudentChart extends Component {
     render() {
         const widthAndHeight = 140;
         const { totalCount, highLevelCount, highMediumLevelCount, lowLevelCount, lowMediumLevelCount } = this.props;
-        const series = [highLevelCount, highMediumLevelCount, lowLevelCount, lowMediumLevelCount];
+        const series = [highLevelCount, highMediumLevelCount, lowMediumLevelCount, lowLevelCount];
         const sliceColor = ['#DFAA21', '#24DA20', '#5040A3', '#A34040'];
 
         // Calculate the sum of the series

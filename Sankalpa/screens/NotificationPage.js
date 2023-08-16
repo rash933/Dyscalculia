@@ -35,7 +35,7 @@ const Notifi = () => {
     }, []);
 
     const fetchData = async (studentID) => {
-        const apiUrl = 'http://192.168.1.3:8000/api/markby';
+        const apiUrl = 'http://192.168.1.2:8000/api/markby';
         const requestData = {
             StudentID: studentID,
         };
@@ -56,7 +56,7 @@ const Notifi = () => {
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
-            <AppBa2 title={'Notification 1'} />
+            <AppBa2 title={'Notification'} />
             <View style={styles.box1}>
 
                 <View style={styles.box3}>

@@ -27,7 +27,7 @@ const StudentAttendence = ({ navigation, route }) => {
                 formData.append('assignment_marks', Mlist4.assignmentm);
                 formData.append('student_class_attendance', Mlist4.attandencem);
 
-                const progressApiUrl = 'http://192.168.1.3:5000/progress';
+                const progressApiUrl = 'http://192.168.1.2:5000/progress';
                 const progressResponse = await axios.post(progressApiUrl, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
@@ -60,7 +60,7 @@ const StudentAttendence = ({ navigation, route }) => {
 
                     console.log(postData);
                     // Make the POST request using Axios
-                    const response = await axios.post('http://192.168.1.3:8000/api/mark/add', postData);
+                    const response = await axios.post('http://192.168.1.2:8000/api/mark/add', postData);
                     console.log('Response:', response.data); // <-- Print the response in the console
                     const markId = response.data.id;
                     console.log(markId);

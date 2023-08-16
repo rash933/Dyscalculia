@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground,BackHandler } from 'react-native';
 import { Avatar, Divider, IconButton, Card, Text, Button } from 'react-native-paper';
@@ -10,18 +10,7 @@ import AppBa3 from '../components/appBa3';
 const GamePage15 = ({ navigation, route }) => {
     const { G3 } = route.params;
 
-    const handlePress = (selectedOption) => {
-        let g4Value = 'false';
-
-        if (selectedOption === 2) {
-            g4Value = 'true';
-        }
-
-        const G4 = { ...G3, g4: g4Value };
-        console.log(G4);
-        // Navigate to the next screen (Profile2) with the parameters
-        navigation.navigate('GamePage3', { G4 });
-    };
+    const [buttonPressed, setButtonPressed] = useState(false);
 
     useEffect(() => {
         // Lock the screen orientation to landscape
@@ -34,11 +23,38 @@ const GamePage15 = ({ navigation, route }) => {
             return true; // Prevent default behavior (going back to the previous screen)
         });
 
+        // Set a timeout to navigate to another screen after 30 seconds
+        const timeout = setTimeout(() => {
+            if (!buttonPressed) {
+                // No button pressed, set g10 to 'false'
+
+                const G4 = { ...G3, g4: 'false' };
+                console.log(G4);
+                // Navigate to the next screen (Profile2) with the parameters
+                navigation.navigate('GamePage3', { G4 });
+            }
+        }, 30000); // 30 seconds
+
         return () => {
-            // Remove the back button event listener when the component unmounts
+            clearTimeout(timeout);
             backHandler.remove();
         };
-    }, []); 
+    }, [buttonPressed]);
+
+
+    const handlePress = (selectedOption) => {
+        let g4Value = 'false';
+
+        if (selectedOption === 2) {
+            g4Value = 'true';
+        }
+        setButtonPressed(true);
+        const G4 = { ...G3, g4: g4Value };
+        console.log(G4);
+        // Navigate to the next screen (Profile2) with the parameters
+        navigation.navigate('GamePage3', { G4 });
+    };
+
 
     return (
         <ImageBackground blurRadius={2}

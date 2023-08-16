@@ -10,7 +10,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const THomeScreen = () => {
     const navigation = useNavigation();
-  
     const [teacherData, setTeacherData] = useState(null);
     const [studentCount, setStudentCount] = useState(0);
     const [highLevelStudentCount, setHighLevelStudentCount] = useState(0);
@@ -18,81 +17,102 @@ const THomeScreen = () => {
     const [lowLevelStudentCount, setLowLevelStudentCount] = useState(0);
     const [lowMediumLevelStudentCount, setLowMediumLevelStudentCount] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
+
     useEffect(() => {
-        // Fetch all students with TeacherID: "0"
         async function fetchData() {
             try {
                 const storedTID = await AsyncStorage.getItem('CurrentTeacherID');
                 if (storedTID) {
-                    fetchStudentData(storedTID);
+                    fetchAndUpdateData(storedTID);
                     fetchTeacherData(storedTID);
                 } else {
                     console.error('No teacher ID found in AsyncStorage.');
-                    setIsLoading(false);
                 }
             } catch (error) {
                 console.error('Error fetching teacher ID from AsyncStorage:', error);
+            } finally {
                 setIsLoading(false);
             }
         }
 
         fetchData();
-       
-  
+        fetchAndUpdateLoop();
     }, []);
 
-
-
-    const fetchStudentData = async (teacherID) => {
+    const fetchAndUpdateData = async (teacherID) => {
         try {
-            const response = await axios.post("http://192.168.1.3:8000/api/markby", {
+            const response = await axios.post("http://192.168.1.2:8000/api/markby", {
                 TeacherId: teacherID,
             });
 
             const students = response.data;
+            const latestPredictions = new Map();
 
-            // Create a set to store unique student IDs
-            const uniqueStudentIds = new Set();
-
-            // Iterate through students to collect unique student IDs
             students.forEach((student) => {
-                uniqueStudentIds.add(student.StudentId);
+                latestPredictions.set(student.StudentID, student.Prediction);
             });
 
-            const uniqueStudentCount = uniqueStudentIds.size;
-
-            // Create a map to store counts for each prediction level
-            const predictionLevelCounts = {
-                "High Level": 0,
-                "High Medium": 0,
-                "Low Level": 0,
-                "Low Medium": 0,
-            };
-
-            // Iterate through students to count based on prediction levels
-            students.forEach((student) => {
-                if (predictionLevelCounts[student.Prediction] === 0) {
-                    predictionLevelCounts[student.Prediction] += 1; // Count only once for each prediction level
-                }
-            });
-
-            setStudentCount(uniqueStudentCount); // Set the count of unique student IDs
-            setHighLevelStudentCount(predictionLevelCounts["High Level"]);
-            setHighMediumLevelStudentCount(predictionLevelCounts["High Medium"]);
-            setLowLevelStudentCount(predictionLevelCounts["Low Level"]);
-            setLowMediumLevelStudentCount(predictionLevelCounts["Low Medium"]);
-
-            setIsLoading(false);
+            updatePredictionCounts(latestPredictions);
         } catch (error) {
             console.error("Error fetching student data:", error);
-            setIsLoading(false);
         }
     };
 
+    const updatePredictionCounts = (latestPredictions) => {
+        const predictionLevelCounts = {
+            "High": 0,
+            "High Medium": 0,
+            "Low": 0,
+            "Low Medium": 0,
+        };
+
+        latestPredictions.forEach((latestPrediction, studentID) => {
+            predictionLevelCounts[latestPrediction] += 1;
+        });
+
+        setStudentCount(latestPredictions.size);
+        setHighLevelStudentCount(predictionLevelCounts["High"]);
+        setHighMediumLevelStudentCount(predictionLevelCounts["High Medium"]);
+        setLowLevelStudentCount(predictionLevelCounts["Low"]);
+        setLowMediumLevelStudentCount(predictionLevelCounts["Low Medium"]);
+    };
+
+    const fetchAndUpdateLoop = async () => {
+        const storedTID = await AsyncStorage.getItem('CurrentTeacherID');
+        const teacherID = storedTID;
+        const updateInterval = 5000; // Check for updates every 5 seconds
+
+        while (true) {
+            const latestPredictions = await fetchStudentData(teacherID);
+            updatePredictionCounts(latestPredictions);
+
+            await new Promise((resolve) => setTimeout(resolve, updateInterval));
+        }
+    };
+
+    const fetchStudentData = async (teacherID) => {
+        try {
+            const response = await axios.post("http://192.168.1.2:8000/api/markby", {
+                TeacherId: teacherID,
+            });
+
+            const students = response.data;
+            const latestPredictions = new Map();
+
+            students.forEach((student) => {
+                latestPredictions.set(student.StudentID, student.Prediction);
+            });
+
+            return latestPredictions;
+        } catch (error) {
+            console.error("Error fetching student data:", error);
+            return new Map();
+        }
+    };
 
     const fetchTeacherData = async (teacherID) => {
         try {
-            const response = await axios.post('http://192.168.1.3:8000/api/teachersby', {
+            const response = await axios.post('http://192.168.1.2:8000/api/teachersby', {
                 _id: teacherID,
             });
             const teacher = response.data[0];
@@ -111,7 +131,9 @@ const THomeScreen = () => {
                     <View style={styles.box1}>
                         <View style={styles.left}>
                             <Text style={styles.Header}>Welcome !</Text>
-                            <Text style={styles.Name}>Hi, Choudary Aoun</Text>
+                            {teacherData && (
+                            <Text style={styles.Name}>Hi, {teacherData.Name}</Text>
+                            )}
                             <Text style={styles.text}>
                                 Check the dyscalculia probability level of{"\n"}students
                             </Text>
@@ -182,17 +204,17 @@ const THomeScreen = () => {
                         <View style={styles.group}>
                             <View style={styles.box6}>
                                 <Text style={styles.smallText}>
-                                    High level{"\n"} student
+                                    High Medium{"\n"} student
                                 </Text>
-                                    <Text style={styles.smallText23}>{highLevelStudentCount}</Text>
+                                    <Text style={styles.smallText24}>{highMediumLevelStudentCount}</Text>
                             </View>
                         </View>
                         <View style={styles.group}>
                             <View style={styles.box6}>
                                 <Text style={styles.smallText}>
-                                    High Medium{"\n"} student
+                                    High level{"\n"} student
                                 </Text>
-                                    <Text style={styles.smallText24}>{highMediumLevelStudentCount}</Text>
+                                    <Text style={styles.smallText23}>{highLevelStudentCount}</Text>
                             </View>
                         </View>
                     </View>
@@ -261,9 +283,10 @@ const styles = StyleSheet.create({
     },
 
     image: {
-        width: 100,
-        height: 100,
-
+        width: 120,
+        height: 150,
+        
+        // backgroundColor: "#000",
     },
 
 

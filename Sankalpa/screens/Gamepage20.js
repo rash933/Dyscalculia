@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Image,BackHandler } from 'react-native';
 import { Avatar, Divider, IconButton, Card, Text, Button } from 'react-native-paper';
@@ -13,13 +13,45 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const GamePage20 = ({ navigation, route }) => {
 
     const { G9 } = route.params;
+
+    const [buttonPressed, setButtonPressed] = useState(false);
+
+    useEffect(() => {
+        // Lock the screen orientation to landscape
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+
+        // Handle back button press
+        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            // Exit the app when the back button is pressed
+            BackHandler.exitApp();
+            return true; // Prevent default behavior (going back to the previous screen)
+        });
+
+        // Set a timeout to navigate to another screen after 30 seconds
+        const timeout = setTimeout(() => {
+            if (!buttonPressed) {
+                // No button pressed, set g10 to 'false'
+                const G10 = { ...G9, g10: 'false' };
+                console.log(G10);
+
+                // Navigate to another screen
+                navigation.navigate('QuizResult');
+            }
+        }, 30000); // 30 seconds
+
+        return () => {
+            clearTimeout(timeout);
+            backHandler.remove();
+        };
+    }, [buttonPressed]);
+
     const handlePress = async (selectedOption) => {
         let g10Value = 'false';
 
         if (selectedOption === 2) {
             g10Value = 'true';
         }
-
+        setButtonPressed(true);
         const G10 = { ...G9, g10: g10Value };
         console.log(G10);
         const trueValuesCount = Object.values(G10).filter((value) => value === 'true').length;
@@ -53,7 +85,7 @@ const GamePage20 = ({ navigation, route }) => {
             // Check if the currentStudentID is available in AsyncStorage
             if (currentStudentID) {
                 // Use the currentStudentID in the API URL for updating Quiz
-                const updateApiUrl = `http://192.168.1.3:8000/api/student/update/${currentStudentID}`;
+                const updateApiUrl = `http://192.168.1.2:8000/api/student/update/${currentStudentID}`;
                 const updateResponse = await axios.put(updateApiUrl, Quiz);
                 console.log('Success updated Quiz to student:', updateResponse.data);
 
@@ -64,7 +96,7 @@ const GamePage20 = ({ navigation, route }) => {
                     formData.append('questionaire_parent', questionaireParent);
                     formData.append('iq_test', iqTest);
 
-                    const probabilityApiUrl = 'http://192.168.1.3:5000/probability';
+                    const probabilityApiUrl = 'http://192.168.1.2:5000/probability';
                     const probabilityResponse = await axios.post(probabilityApiUrl, formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
@@ -88,7 +120,7 @@ const GamePage20 = ({ navigation, route }) => {
                     };
                     console.log(updateData);
                     // Construct the API update URL
-                    const updateApiUrl = `http://192.168.1.3:8000/api/student/update/${currentStudentID}`;
+                    const updateApiUrl = `http://192.168.1.2:8000/api/student/update/${currentStudentID}`;
 
                     // Make a PUT request to update the student's prediction result
                     axios.put(updateApiUrl, updateData)
@@ -125,22 +157,7 @@ const GamePage20 = ({ navigation, route }) => {
 
 
     };
-    useEffect(() => {
-        // Lock the screen orientation to landscape
-        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
 
-        // Handle back button press
-        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            // Exit the app when the back button is pressed
-            BackHandler.exitApp();
-            return true; // Prevent default behavior (going back to the previous screen)
-        });
-
-        return () => {
-            // Remove the back button event listener when the component unmounts
-            backHandler.remove();
-        };
-    }, []); 
 
     return (
         <ImageBackground blurRadius={2}
@@ -228,7 +245,7 @@ const styles = StyleSheet.create({
     },
 
     Image: {
-        height: 120, width: 200,
+        height: 120, width: 180,
         // backgroundColor:'#000'
     },
 

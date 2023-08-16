@@ -11,13 +11,13 @@ const TProfileScreen = () => {
     const [highLevelStudentCount, setHighLevelStudentCount] = useState(0);
 
     useEffect(() => {
-        axios.post('http://192.168.1.3:8000/api/studentby', {
-            TeacherID: "CurrentTeacherID"
+        axios.post('http://192.168.1.2:8000/api/studentby', {
+           
         })
             .then(response => {
                 const students = response.data;
                 setStudentCount(students.length);
-                const highLevelStudents = students.filter(student => student.LevelStatus === "high");
+                const highLevelStudents = students.filter(student => student.LevelStatus === "High");
                 setHighLevelStudentCount(highLevelStudents.length);
             })
             .catch(error => {
@@ -31,7 +31,7 @@ const TProfileScreen = () => {
         try {
             const CurrentTeacherID = await AsyncStorage.getItem('CurrentTeacherID');
             if (CurrentTeacherID) {
-                const response = await axios.post('http://192.168.1.3:8000/api/teachersby', {
+                const response = await axios.post('http://192.168.1.2:8000/api/teachersby', {
                     _id: CurrentTeacherID,
                 });
                 const teacher = response.data[0];

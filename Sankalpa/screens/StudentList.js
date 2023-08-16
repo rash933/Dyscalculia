@@ -22,7 +22,7 @@ const StudentList = ({ navigation }) => {
                 const currentTeacherID = await AsyncStorage.getItem('CurrentTeacherID');
 
                 if (currentTeacherID) {
-                    const response = await axios.post('http://192.168.1.3:8000/api/studentby', {
+                    const response = await axios.post('http://192.168.1.2:8000/api/studentby', {
                         TeacherID: currentTeacherID,
                         LevelStatus: 'High',
                     });
@@ -72,7 +72,7 @@ const StudentList = ({ navigation }) => {
                             <Card key={student._id} mode="outlined" style={styles.card}>
                                 <Card.Title
                                     title={student.Name}
-                                    subtitle={student.StageStatus ? 'Primary School' : 'Middle School'}
+                                    subtitle={student.StageStatus ? 'Middle School' : 'Primary School'}
                                     left={(props) => <Avatar.Text {...props} label={student.Name[0]} />}
                                     right={(props) => <IconButton {...props} icon="dots-vertical" onPress={() => { }} />}
                                 />

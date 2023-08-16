@@ -20,7 +20,7 @@ const Profile4 = ({ navigation, route }) => {
             };
 
             // Send the POST request
-            const response = await axios.post('http://192.168.1.3:8000/api/studentby', requestData);
+            const response = await axios.post('http://192.168.1.2:8000/api/studentby', requestData);
 
             // Extract the StageStatus property from the response data
             const studentData = response.data[0];
@@ -46,7 +46,7 @@ const Profile4 = ({ navigation, route }) => {
             // Check if the currentStudentID is available in AsyncStorage
             if (StudentID) {
                 // Use the currentStudentID in the API URL for updating student data
-                const updateApiUrl = `http://192.168.1.3:8000/api/student/update/${StudentID}`;
+                const updateApiUrl = `http://192.168.1.2:8000/api/student/update/${StudentID}`;
                 const response = await axios.put(updateApiUrl, IQCheck4);
                 console.log('Success updated student data:', response.data);
             } else {

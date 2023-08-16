@@ -44,7 +44,7 @@ const StSignIn = ({ navigation, route }) => {
 
         // Make the POST request to the server
         axios
-            .post("http://192.168.1.3:8000/api/students/login", {
+            .post("http://192.168.1.2:8000/api/students/login", {
           
                     Name: username,
                     Password: password,

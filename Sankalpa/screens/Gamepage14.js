@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground,BackHandler } from 'react-native';
 import { Avatar, Divider, IconButton, Card, Text, Button } from 'react-native-paper';
@@ -9,18 +9,8 @@ import AppBa3 from '../components/appBa3';
 
 const GamePage14 = ({ navigation, route }) => {
     const { G2 } = route.params;
-    const handlePress = (selectedOption) => {
-        let g3Value = 'false';
 
-        if (selectedOption === 1) {
-            g3Value = 'true';
-        }
-
-        const G3 = { ...G2, g3: g3Value };
-        console.log(G3);
-        // Navigate to the next screen (Profile2) with the parameters
-        navigation.navigate('GamePage15', { G3 });
-    };
+    const [buttonPressed, setButtonPressed] = useState(false);
 
     useEffect(() => {
         // Lock the screen orientation to landscape
@@ -33,11 +23,37 @@ const GamePage14 = ({ navigation, route }) => {
             return true; // Prevent default behavior (going back to the previous screen)
         });
 
+        // Set a timeout to navigate to another screen after 30 seconds
+        const timeout = setTimeout(() => {
+            if (!buttonPressed) {
+                // No button pressed, set g10 to 'false'
+                const G3 = { ...G2, g3: 'false' };
+                console.log(G3);
+                // Navigate to the next screen (Profile2) with the parameters
+                navigation.navigate('GamePage15', { G3 });
+            }
+        }, 30000); // 30 seconds
+
         return () => {
-            // Remove the back button event listener when the component unmounts
+            clearTimeout(timeout);
             backHandler.remove();
         };
-    }, []); 
+    }, [buttonPressed]);
+
+    const handlePress = (selectedOption) => {
+        let g3Value = 'false';
+
+        if (selectedOption === 1) {
+            g3Value = 'true';
+        }
+        setButtonPressed(true);
+        const G3 = { ...G2, g3: g3Value };
+        console.log(G3);
+        // Navigate to the next screen (Profile2) with the parameters
+        navigation.navigate('GamePage15', { G3 });
+    };
+
+   
 
 
 
