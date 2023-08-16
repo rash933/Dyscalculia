@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Image, } from 'react-native';
+import { StyleSheet, View, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { Text, Button, ProgressBar, Avatar, IconButton } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
 import { Card } from 'react-native-paper';
@@ -9,7 +9,8 @@ import axios from 'axios';
 const VerifyStudent = ({ navigation, route }) => {
     const { studentId } = route.params;
     const [studentData, setStudentData] = useState(null); // This will hold the student data
-
+    const [predictionHistory, setPredictionHistory] = useState([]);
+      const [showPredictions, setShowPredictions] = useState(false);
     // Function to fetch student data by ID
     useEffect(() => {
         const fetchStudentData = async () => {
@@ -17,9 +18,15 @@ const VerifyStudent = ({ navigation, route }) => {
                 const response = await axios.post('http://192.168.1.2:8000/api/studentby', {
                     _id: studentId,
                 });
-                setStudentData(response.data[0]); // Assuming the API returns an array with a single student object
+                setStudentData(response.data[0]);
+
+                // Assuming you have another API endpoint to fetch prediction history
+                const predictionResponse = await axios.post('http://192.168.1.2:8000/api/markby', {
+                    StudentID: studentId,
+                });
+                setPredictionHistory(predictionResponse.data);
             } catch (error) {
-                console.error('Error fetching student data:', error);
+                console.error('Error fetching data:', error);
             }
         };
 
@@ -56,7 +63,24 @@ const VerifyStudent = ({ navigation, route }) => {
                                 <Text variant="titleMedium">Email:  {studentData.Email}</Text>
                                 <Text variant="titleMedium">IQ Results :  {studentData.Iq}</Text>
                                 <Text variant="titleMedium">Child Behavior Marks:  {studentData.ParentQ}</Text>
-                                <Text variant="titleMedium">Quiz:  {studentData.Quiz}</Text>
+                                
+                                <Button onPress={() => setShowPredictions(!showPredictions)}>Show Predictions history</Button>
+                                
+                                {showPredictions && (
+                                    <View style={styles.box5}>
+                                        <Text variant="titleLarge" style={{ marginTop: 20 }}>Prediction History</Text>
+                                    <ScrollView>
+                                        {/* ... Other card content here ... */}
+                                    
+                                        {predictionHistory.map((prediction, index) => (
+                                            <Text key={prediction._id} variant="titleMedium">
+                                                Prediction no. {index + 1}: {prediction.Prediction}
+                                            </Text>
+                                        ))}
+                                    </ScrollView>
+                                    </View>
+                                )}
+
                                 {/* Display any other student details here */}
                             </Card.Content>
                         </Card>
@@ -136,7 +160,12 @@ const styles = StyleSheet.create({
        marginBottom:20
 
     },
+    box5: {
+        
+        marginTop: 10,
+       height:100,
 
+    },
 
 });
 
