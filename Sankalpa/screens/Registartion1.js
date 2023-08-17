@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, Keyboard } from "react-native";
-import { Avatar, Divider, IconButton, Card, Text, Button, TextInput, PaperProvider, RadioButton } from 'react-native-paper';
+import { Text, Button, TextInput, RadioButton } from 'react-native-paper';
 import Background1 from '../components/background1';
-import { useNavigation } from '@react-navigation/core';
+
 
 
 const Registation1 = ({ navigation }) => {
@@ -65,7 +65,7 @@ const Registation1 = ({ navigation }) => {
                         <Text style={{ textAlign: 'left' }} variant="labelLarge">User Role</Text>
                         <RadioButton.Group onValueChange={value => setValue(value)} value={role} >
 
-                            <View style={{ width: 250, display: 'flex', flexDirection: 'row', justifyContent: '', borderColor: '#000', borderWidth: 1, borderRadius: 4 }}>
+                            <View style={{ width: 250, display: 'flex', flexDirection: 'row',  borderColor: '#000', borderWidth: 1, borderRadius: 4 }}>
                                 <RadioButton.Item label="Student" value="true" position='leading' />
                                 <RadioButton.Item label="Teacher" value="false" position='leading' />
                             </View>
@@ -109,7 +109,7 @@ const Registation1 = ({ navigation }) => {
                 </View>
 
                 <View style={styles.buttonBox}  >
-                    <Button style={styles.button} textColor='#ffff' buttonColor='#002060' mode="contained" onPress={Next}>
+                    <Button style={styles.button} mode="contained" onPress={Next}>
                         Next
                     </Button>
                     <View style={styles.row} >

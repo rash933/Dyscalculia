@@ -51,6 +51,13 @@ const StudentList = ({ navigation }) => {
         student.Name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}.${month}.${day}`;
+    }
     return (
         <View style={styles.container}>
             <StatusBar style="inverted" />
@@ -62,7 +69,7 @@ const StudentList = ({ navigation }) => {
                         value={searchQuery}
                         onChangeText={(query) => setSearchQuery(query)}
                         right={<TextInput.Icon name="close" onPress={() => setSearchQuery('')} />}
-                        left={<TextInput.Icon name="account-search" onPress={() => { }} />}
+                        left={<TextInput.Icon name="account-search" />}
                     />
                 </View>
                 <View style={styles.box3}>
@@ -78,7 +85,7 @@ const StudentList = ({ navigation }) => {
                                 />
                                 <Divider />
                                 <Card.Content>
-                                    <Text variant="headlineMedium">Dob: {student.Dob}</Text>
+                                    <Text variant="headlineMedium">Dob: {formatDate(student.Dob)}</Text>
                                     <Text variant="titleMedium">Email: {student.Email}</Text>
                                     {/* Display any other student details here */}
                                 </Card.Content>

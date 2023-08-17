@@ -93,8 +93,8 @@ const FinalResults = ({ navigation, route }) => {
                                     </Text>
                                 </View>
                                 <View style={styles.group} >
-                                    <Text style={{ marginBottom: 10, fontWeight: 'bold' }} variant="titleLarge">Skill Level Result  :</Text>
-                                    <Text style={{ marginBottom: 10, color: '#ec0b43' }} variant="titleLarge">  {studentData.Prediction}</Text>
+                                        <Text style={{ marginBottom: 10, fontWeight: 'bold' }} variant="titleMedium">Skill Level Result  :</Text>
+                                        <Text style={{ marginBottom: 10, color: '#ec0b43' }} variant="titleMedium">  {studentData.Prediction}</Text>
                                 </View>
                                 <View style={styles.group} >
                                     <Text style={{ marginBottom: 10 }} variant="titleMedium">Teacher Feedback  :</Text>

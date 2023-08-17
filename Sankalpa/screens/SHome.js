@@ -59,7 +59,7 @@ const StdHomeScreen = () => {
                             <View style={styles.box}>
                                 <View style={styles.left}>
                                     <Text style={styles.Header}>Welcome !</Text>
-                                    <Text style={styles.Name}>Hi, Choudary Aoun</Text>
+                                    <Text style={styles.Name}>Hi, {name}</Text>
                                     <Text style={styles.text}>
                                         Check the dyscalculia probability level of{"\n"}students
                                     </Text>

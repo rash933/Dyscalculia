@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
-import { List, Avatar } from 'react-native-paper';
+import { StyleSheet, View, ScrollView } from 'react-native';
+import { List, Avatar, Text } from 'react-native-paper';
 import AppBa2 from '../components/appBar2';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -102,7 +102,7 @@ const ResultList = () => {
                                     labelStyle: {
                                         width: 100,
                                     },
-                                 c
+                                 
                                 },
                                 {
                                     icon: '',
@@ -133,6 +133,7 @@ const ResultList = () => {
                         />
                     </ScrollView>
                     <ScrollView style={styles.scrollContainer}>
+                        <Text variant="titleMedium">{value}</Text>
                             {students
                                 .filter((student) => student.Prediction === value)
                                 .map((student) => (
